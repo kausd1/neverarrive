@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#FF4500">
+<meta name="description" content="Order your favourite food. It never arrives. Zero calories, zero rupees, 100% satisfaction.">
+<meta property="og:title" content="NeverArrive — Guilt-free food ordering for India">
+<meta property="og:description" content="Open the app. Browse. Order. Feel better. The food never comes — and that's the point.">
+<title>NeverArrive 🛵</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root {
+  --orange: #FF4500;
+  --orange-light: #FFF0EB;
+  --orange-dark: #CC3700;
+  --green: #1E8C45;
+  --green-light: #E8F5EE;
+  --text: #1A1A1A;
+  --muted: #6B7280;
+  --border: #E5E7EB;
+  --surface: #F9FAFB;
+  --white: #FFFFFF;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Inter', sans-serif; background: var(--white); color: var(--text); min-height: 100vh; max-width: 480px; margin: 0 auto; }
+
+.screen { display: none; flex-direction: column; min-height: 100vh; }
+.screen.active { display: flex; }
+
+/* LOCATION SETUP SCREEN */
+.loc-screen { flex: 1; display: flex; flex-direction: column; padding: 32px 24px; }
+.loc-logo { font-size: 48px; margin-bottom: 8px; }
+.loc-title { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+.loc-sub { font-size: 14px; color: var(--muted); margin-bottom: 32px; line-height: 1.6; }
+.loc-detect-btn { background: var(--orange); color: white; border: none; border-radius: var(--radius); padding: 16px; font-size: 15px; font-weight: 600; width: 100%; cursor: pointer; font-family: 'Inter', sans-serif; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.loc-manual-label { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 12px; }
+.loc-search-wrap { position: relative; }
+.loc-search-input { width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 13px 14px 13px 40px; font-size: 15px; font-family: 'Inter', sans-serif; color: var(--text); outline: none; transition: border-color 0.15s; }
+.loc-search-input:focus { border-color: var(--orange); }
+.loc-search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+.loc-suggestions { background: white; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-top: 4px; overflow: hidden; display: none; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+.loc-suggestion { padding: 13px 16px; font-size: 14px; cursor: pointer; display: flex; align-items: flex-start; gap: 10px; border-bottom: 1px solid var(--border); }
+.loc-suggestion:last-child { border-bottom: none; }
+.loc-suggestion:hover { background: var(--surface); }
+.loc-suggestion-pin { color: var(--orange); margin-top: 1px; flex-shrink: 0; }
+.loc-suggestion-main { font-weight: 500; }
+.loc-suggestion-sub { font-size: 12px; color: var(--muted); }
+.loc-detecting { display: flex; align-items: center; gap: 10px; padding: 14px; background: var(--orange-light); border-radius: var(--radius-sm); margin-top: 12px; font-size: 13px; color: var(--orange-dark); display: none; }
+.spinner { width: 16px; height: 16px; border: 2px solid var(--orange-light); border-top-color: var(--orange); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* HEADER */
+.header { background: var(--orange); padding: 14px 16px; color: white; position: sticky; top: 0; z-index: 100; }
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.header-brand { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+.header-loc { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; background: rgba(255,255,255,0.15); border-radius: 20px; padding: 5px 10px; }
+.header-loc-name { font-weight: 500; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.search-bar { display: flex; align-items: center; gap: 10px; background: white; border-radius: var(--radius-sm); padding: 10px 14px; color: var(--muted); font-size: 14px; margin-top: 10px; }
+
+/* CATEGORIES */
+.cat-scroll { display: flex; gap: 8px; padding: 14px 16px; overflow-x: auto; scrollbar-width: none; }
+.cat-scroll::-webkit-scrollbar { display: none; }
+.cat-pill { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 7px 16px; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; color: var(--text); transition: all 0.15s; flex-shrink: 0; }
+.cat-pill.active { background: var(--orange); color: white; border-color: var(--orange); }
+
+/* BANNER */
+.banner { margin: 0 16px 16px; background: var(--orange-light); border: 1px solid #FFD4C2; border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+.banner-text { font-size: 13px; color: var(--orange-dark); line-height: 1.5; }
+.banner-text strong { display: block; font-size: 14px; margin-bottom: 2px; }
+
+/* ETA STRIP */
+.eta-strip { margin: 0 16px 12px; background: var(--green-light); border: 1px solid #BBE0CC; border-radius: var(--radius-sm); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; }
+.eta-strip-left { font-size: 13px; color: var(--green); font-weight: 500; }
+.eta-strip-right { font-size: 13px; color: var(--muted); }
+
+/* ITEMS */
+.items { padding: 0 16px; flex: 1; }
+.section-title { font-size: 17px; font-weight: 600; margin-bottom: 12px; color: var(--text); }
+.item-card { border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; background: white; transition: border-color 0.15s; }
+.item-card:hover { border-color: var(--orange); }
+.item-inner { display: flex; gap: 12px; padding: 14px; }
+.item-img { width: 80px; height: 80px; border-radius: var(--radius-sm); flex-shrink: 0; font-size: 36px; display: flex; align-items: center; justify-content: center; background: var(--surface); }
+.item-details { flex: 1; min-width: 0; }
+.item-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.item-desc { font-size: 12px; color: var(--muted); margin-bottom: 8px; line-height: 1.4; }
+.item-meta { display: flex; align-items: center; justify-content: space-between; }
+.item-price { font-size: 15px; font-weight: 700; color: var(--text); }
+.item-rating { display: flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 500; color: var(--green); background: var(--green-light); padding: 3px 7px; border-radius: 5px; }
+.add-btn { border: 1.5px solid var(--orange); color: var(--orange); background: white; border-radius: 6px; padding: 6px 16px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: 'Inter', sans-serif; }
+.add-btn.added { background: var(--orange); color: white; }
+.veg-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+.item-veg { display: flex; align-items: center; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+
+/* CART BAR */
+.cart-bar { background: var(--orange); color: white; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin: 12px 16px 24px; border-radius: var(--radius); }
+.cart-bar.hidden { display: none; }
+.cart-left { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; }
+.cart-badge { background: rgba(255,255,255,0.25); border-radius: 6px; padding: 2px 8px; font-size: 13px; font-weight: 600; }
+
+/* CART SCREEN */
+.back-btn { display: flex; align-items: center; gap: 8px; padding: 16px; font-size: 15px; font-weight: 500; cursor: pointer; color: var(--text); background: white; border-bottom: 1px solid var(--border); }
+.cart-header { padding: 20px 16px 12px; border-bottom: 1px solid var(--border); }
+.cart-header h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.cart-header p { font-size: 13px; color: var(--muted); }
+.cart-items { padding: 0 16px; flex: 1; }
+.cart-item { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.cart-item-emoji { font-size: 28px; width: 44px; text-align: center; }
+.cart-item-name { flex: 1; font-size: 14px; font-weight: 500; }
+.qty-control { display: flex; align-items: center; gap: 8px; }
+.qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--orange); background: white; color: var(--orange); font-size: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; }
+.qty-num { font-size: 14px; font-weight: 600; min-width: 16px; text-align: center; }
+.cart-item-price { font-size: 14px; font-weight: 600; min-width: 60px; text-align: right; }
+.bill-section { margin: 16px; background: var(--surface); border-radius: var(--radius); padding: 16px; }
+.bill-section h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.bill-row { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; }
+.bill-row.total { font-weight: 700; font-size: 15px; padding-top: 10px; margin-top: 6px; border-top: 1px solid var(--border); }
+.bill-row .free { color: var(--green); font-weight: 500; }
+.savings-badge { background: var(--green-light); border: 1px solid #BBE0CC; border-radius: var(--radius-sm); padding: 10px 14px; margin: 0 16px 16px; font-size: 13px; color: var(--green); font-weight: 500; }
+.place-btn { margin: 0 16px 32px; background: var(--orange); color: white; border: none; border-radius: var(--radius); padding: 16px; font-size: 16px; font-weight: 600; width: calc(100% - 32px); cursor: pointer; font-family: 'Inter', sans-serif; }
+
+/* CHECKOUT */
+.checkout-wrap { padding: 20px 16px; flex: 1; }
+.form-section { margin-bottom: 24px; }
+.form-label { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: block; }
+.address-display { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 14px; color: var(--text); background: var(--surface); line-height: 1.5; display: flex; align-items: flex-start; gap: 10px; }
+.address-display-icon { color: var(--orange); margin-top: 2px; flex-shrink: 0; }
+.address-display-text { flex: 1; }
+.address-display-change { font-size: 12px; color: var(--orange); font-weight: 500; cursor: pointer; margin-top: 4px; display: block; }
+.pay-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pay-opt { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px; cursor: pointer; text-align: center; transition: all 0.15s; }
+.pay-opt.selected { border-color: var(--orange); background: var(--orange-light); }
+.pay-opt-icon { font-size: 22px; margin-bottom: 4px; }
+.pay-opt-label { font-size: 12px; font-weight: 500; color: var(--text); }
+.confirm-btn { margin-top: 8px; background: var(--orange); color: white; border: none; border-radius: var(--radius); padding: 16px; font-size: 16px; font-weight: 600; width: 100%; cursor: pointer; font-family: 'Inter', sans-serif; }
+
+/* TRACKING */
+.tracking-header { padding: 20px 16px 0; }
+.tracking-header h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.tracking-header p { font-size: 13px; color: var(--muted); }
+.status-wrap { margin: 16px; }
+.status-bar { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--surface); border-radius: var(--radius); }
+.status-step { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+.status-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.status-dot.done { background: var(--green); }
+.status-dot.active { background: var(--orange); animation: pulse 1.5s infinite; }
+.status-dot.pending { background: var(--border); }
+.status-line { flex: 1; height: 2px; background: var(--border); margin: 0 4px; margin-top: -20px; position: relative; top: 16px; }
+.status-line.done { background: var(--green); }
+.status-label { font-size: 11px; color: var(--muted); text-align: center; font-weight: 500; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+#map { height: 300px; width: calc(100% - 32px); margin: 0 16px 12px; border-radius: var(--radius); overflow: hidden; }
+.eta-card { margin: 0 16px 12px; border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; background: white; }
+.eta-label { font-size: 13px; color: var(--muted); margin-bottom: 2px; }
+.eta-time { font-size: 28px; font-weight: 700; color: var(--orange); }
+.eta-mins { font-size: 13px; color: var(--muted); }
+.rider-info { display: flex; align-items: center; gap: 12px; }
+.rider-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--orange-light); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.rider-name { font-size: 14px; font-weight: 600; }
+.rider-sub { font-size: 12px; color: var(--muted); }
+.distance-card { margin: 0 16px 12px; background: var(--surface); border-radius: var(--radius-sm); padding: 12px 16px; display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
+.distance-card span { font-weight: 600; color: var(--text); }
+
+/* SUCCESS */
+.success-screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; text-align: center; }
+.success-emoji { font-size: 72px; margin-bottom: 16px; animation: bounce 0.6s ease; }
+@keyframes bounce { 0%{transform:scale(0.5)} 70%{transform:scale(1.1)} 100%{transform:scale(1)} }
+.success-title { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+.success-sub { font-size: 15px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+.savings-pill { background: var(--green-light); color: var(--green); font-size: 15px; font-weight: 600; padding: 10px 20px; border-radius: 24px; margin-bottom: 20px; }
+.streak-card { background: var(--orange-light); border: 1px solid #FFD4C2; border-radius: var(--radius); padding: 14px 16px; width: 100%; margin-bottom: 16px; text-align: left; }
+.streak-card h4 { font-size: 14px; font-weight: 600; color: var(--orange-dark); margin-bottom: 4px; }
+.streak-card p { font-size: 13px; color: var(--orange-dark); opacity: 0.8; }
+.share-row { display: flex; gap: 10px; width: 100%; margin-bottom: 12px; }
+.share-btn { flex: 1; background: #25D366; color: white; border: none; border-radius: var(--radius-sm); padding: 13px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+.share-btn.tw { background: #1A1A1A; }
+.restart-btn { width: 100%; border: 1.5px solid var(--border); background: white; border-radius: var(--radius); padding: 14px; font-size: 15px; font-weight: 500; cursor: pointer; color: var(--text); font-family: 'Inter', sans-serif; }
+</style>
+</head>
+<body>
+
+<!-- SCREEN 0: LOCATION SETUP -->
+<div class="screen active" id="screen-location">
+  <div class="loc-screen">
+    <div class="loc-logo">🛵</div>
+    <div class="loc-title">Where are you?</div>
+    <div class="loc-sub">We'll calculate a realistic fake delivery time based on your actual location.</div>
+
+    <button class="loc-detect-btn" onclick="detectLocation()">
+      <svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+      Use my current location
+    </button>
+
+    <div class="loc-manual-label">— or search manually —</div>
+
+    <div class="loc-search-wrap">
+      <svg class="loc-search-icon" width="16" height="16" fill="none" stroke="#9CA3AF" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="loc-search-input" id="loc-input" type="text" placeholder="Search your area, e.g. Koramangala..." oninput="searchLocation(this.value)" autocomplete="off">
+      <div class="loc-suggestions" id="loc-suggestions"></div>
+    </div>
+
+    <div class="loc-detecting" id="loc-detecting">
+      <div class="spinner"></div>
+      Detecting your location...
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 1: HOME -->
+<div class="screen" id="screen-home">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand">NeverArrive 🛵</div>
+      <div class="header-loc" onclick="showScreen('location')">
+        <svg width="12" height="12" fill="white" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+        <span class="header-loc-name" id="header-loc-name">Set location</span>
+        <svg width="10" height="10" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+    </div>
+    <div class="search-bar">
+      <svg width="16" height="16" fill="none" stroke="#9CA3AF" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Search biryani, pizza, chai...
+    </div>
+  </div>
+
+  <div class="cat-scroll">
+    <div class="cat-pill active" onclick="filterCat('all', this)">All</div>
+    <div class="cat-pill" onclick="filterCat('pizza', this)">🍕 Pizza</div>
+    <div class="cat-pill" onclick="filterCat('biryani', this)">🍛 Biryani</div>
+    <div class="cat-pill" onclick="filterCat('dessert', this)">🍮 Desserts</div>
+    <div class="cat-pill" onclick="filterCat('chai', this)">☕ Chai & Snacks</div>
+  </div>
+
+  <div style="padding: 0 16px 12px;">
+    <div class="banner">
+      <div style="font-size:28px;">🧘</div>
+      <div class="banner-text">
+        <strong>Guilt-free ordering</strong>
+        Browse, order, feel better. ₹0 spent. The food never comes — and that's the point.
+      </div>
+    </div>
+  </div>
+
+  <div class="eta-strip" id="eta-strip">
+    <div class="eta-strip-left">🟢 Delivering to <span id="eta-strip-loc">your area</span></div>
+    <div class="eta-strip-right" id="eta-strip-time">25–35 min</div>
+  </div>
+
+  <div class="items" id="items-list"></div>
+  <div style="height:12px;"></div>
+
+  <div class="cart-bar hidden" id="cart-bar" onclick="goToCart()">
+    <div class="cart-left">
+      <span class="cart-badge" id="cart-count">0</span>
+      View cart
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;">
+      <span id="cart-price">₹0</span>
+      <svg width="16" height="16" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: CART -->
+<div class="screen" id="screen-cart">
+  <div class="back-btn" onclick="showScreen('home')">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+    Back to menu
+  </div>
+  <div class="cart-header">
+    <h2>Your order</h2>
+    <p>Fake Bites Cloud Kitchen · <span id="cart-eta-text">25–35 min</span></p>
+  </div>
+  <div class="cart-items" id="cart-items-list"></div>
+  <div class="bill-section">
+    <h3>Bill details</h3>
+    <div class="bill-row"><span>Item total</span><span id="bill-subtotal">₹0</span></div>
+    <div class="bill-row"><span>Delivery fee</span><span class="free">FREE</span></div>
+    <div class="bill-row"><span>Platform fee</span><span class="free">FREE</span></div>
+    <div class="bill-row"><span>CGST + SGST (5%)</span><span id="bill-tax">₹0</span></div>
+    <div class="bill-row total"><span>TO PAY</span><span id="bill-total">₹0</span></div>
+  </div>
+  <div class="savings-badge">🎉 You're saving <span id="savings-amount">₹0</span> by not actually ordering!</div>
+  <button class="place-btn" onclick="goToCheckout()">Proceed to checkout →</button>
+</div>
+
+<!-- SCREEN 3: CHECKOUT -->
+<div class="screen" id="screen-checkout">
+  <div class="back-btn" onclick="showScreen('cart')">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+    Back to cart
+  </div>
+  <div class="checkout-wrap">
+    <div class="form-section">
+      <label class="form-label">Delivering to</label>
+      <div class="address-display">
+        <div class="address-display-icon">📍</div>
+        <div>
+          <div class="address-display-text" id="checkout-address">Your location</div>
+          <span class="address-display-change" onclick="showScreen('location')">Change location</span>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <label class="form-label">Payment method</label>
+      <div class="pay-options">
+        <div class="pay-opt selected" onclick="selectPay(this)"><div class="pay-opt-icon">📱</div><div class="pay-opt-label">UPI</div></div>
+        <div class="pay-opt" onclick="selectPay(this)"><div class="pay-opt-icon">💳</div><div class="pay-opt-label">Card</div></div>
+        <div class="pay-opt" onclick="selectPay(this)"><div class="pay-opt-icon">💵</div><div class="pay-opt-label">Cash</div></div>
+        <div class="pay-opt" onclick="selectPay(this)"><div class="pay-opt-icon">🏦</div><div class="pay-opt-label">Net banking</div></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <label class="form-label">Order summary</label>
+      <div style="background:var(--surface);border-radius:var(--radius-sm);padding:14px;">
+        <div class="bill-row"><span>Estimated delivery</span><span id="checkout-eta" style="font-weight:600;color:var(--orange);">25–35 min</span></div>
+        <div class="bill-row" style="margin-top:6px;"><span>Total payable</span><span id="checkout-total" style="font-weight:700;">₹0</span></div>
+        <div style="margin-top:8px;font-size:12px;color:var(--green);font-weight:500;">✓ No real payment. No actual charge. Ever.</div>
+      </div>
+    </div>
+    <button class="confirm-btn" onclick="placeOrder()">Place order (fake) →</button>
+  </div>
+</div>
+
+<!-- SCREEN 4: TRACKING -->
+<div class="screen" id="screen-tracking">
+  <div class="tracking-header">
+    <h2>Order placed! 🎉</h2>
+    <p>Your imaginary food is on its way</p>
+  </div>
+  <div class="status-wrap">
+    <div class="status-bar">
+      <div class="status-step">
+        <div class="status-dot done" id="s1">✓</div>
+        <span class="status-label">Placed</span>
+      </div>
+      <div class="status-line done" id="l1"></div>
+      <div class="status-step">
+        <div class="status-dot active" id="s2">👨‍🍳</div>
+        <span class="status-label">Preparing</span>
+      </div>
+      <div class="status-line" id="l2"></div>
+      <div class="status-step">
+        <div class="status-dot pending" id="s3">🛵</div>
+        <span class="status-label">On the way</span>
+      </div>
+      <div class="status-line" id="l3"></div>
+      <div class="status-step">
+        <div class="status-dot pending" id="s4">🏠</div>
+        <span class="status-label">Delivered</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <div class="eta-card">
+    <div>
+      <div class="eta-label">Arriving in</div>
+      <div><span class="eta-time" id="eta-time">28</span> <span class="eta-mins">mins</span></div>
+    </div>
+    <div class="rider-info">
+      <div class="rider-avatar">🧑</div>
+      <div>
+        <div class="rider-name">Ravi Kumar</div>
+        <div class="rider-sub">⭐ 4.8 · Hero Splendor</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="distance-card">
+    <div>Distance <span id="dist-display">2.4 km</span></div>
+    <div>Avg speed <span>18 km/h</span></div>
+    <div>Traffic <span id="traffic-display">Moderate</span></div>
+  </div>
+
+  <div style="padding:0 16px 32px;">
+    <div style="background:var(--orange-light);border-radius:var(--radius);padding:14px 16px;font-size:13px;color:var(--orange-dark);line-height:1.6;">
+      <strong>Heads up:</strong> This is a fake order. No food is coming, no money was charged. Enjoy the dopamine! 🧠✨
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 5: SUCCESS -->
+<div class="screen" id="screen-success">
+  <div class="success-screen">
+    <div class="success-emoji">🛵💨</div>
+    <div class="success-title">Delivered! (not really)</div>
+    <div class="success-sub">Your imaginary food arrived. Cravings handled. Wallet intact. Diet survives another day.</div>
+    <div class="savings-pill" id="final-savings">You saved ₹0 today!</div>
+    <div class="streak-card">
+      <h4>🔥 <span id="streak-count">1</span>-day streak!</h4>
+      <p>Days you handled cravings without actually ordering. Keep it going!</p>
+    </div>
+    <div class="share-row">
+      <button class="share-btn" onclick="shareWhatsApp()">📱 WhatsApp</button>
+      <button class="share-btn tw" onclick="shareTwitter()">𝕏 Share</button>
+    </div>
+    <button class="restart-btn" onclick="resetApp()">Order again 🍕</button>
+  </div>
+</div>
+
+<script>
+const MENU = [
+  {id:1,cat:'pizza',emoji:'🍕',name:'Paneer Tikka Pizza',desc:'Spiced cottage cheese, capsicum, red onion on tandoori base.',price:319,rating:'4.5',reviews:'3.8k',veg:true},
+  {id:2,cat:'pizza',emoji:'🍕',name:'Margherita Supreme',desc:'San Marzano tomato, double mozzarella, fresh basil.',price:249,rating:'4.3',reviews:'2.1k',veg:true},
+  {id:3,cat:'pizza',emoji:'🍕',name:'Chicken Keema Pizza',desc:'Spicy minced chicken, jalapeños, cheddar blend.',price:349,rating:'4.4',reviews:'1.9k',veg:false},
+  {id:4,cat:'biryani',emoji:'🍛',name:'Hyderabadi Dum Biryani',desc:'Slow-cooked basmati, saffron, whole spices. With raita.',price:289,rating:'4.6',reviews:'5.1k',veg:false},
+  {id:5,cat:'biryani',emoji:'🍛',name:'Veg Biryani Punjabi Style',desc:'Mixed vegetables, fried onions, ghee-roasted cashews.',price:219,rating:'4.3',reviews:'2.4k',veg:true},
+  {id:6,cat:'biryani',emoji:'🍛',name:'Mutton Biryani',desc:'Tender mutton, long-grain rice, caramelised onions.',price:359,rating:'4.7',reviews:'6.2k',veg:false},
+  {id:7,cat:'dessert',emoji:'🍰',name:'Gulab Jamun Cheesecake',desc:'Rose-cardamom cheesecake topped with warm gulab jamuns.',price:189,rating:'4.8',reviews:'4.2k',veg:true},
+  {id:8,cat:'dessert',emoji:'🍫',name:'Belgian Choco Lava',desc:'Warm dark chocolate lava cake with vanilla ice cream.',price:149,rating:'4.6',reviews:'8.1k',veg:true},
+  {id:9,cat:'dessert',emoji:'🍮',name:'Mango Shrikhand',desc:'Thick strained yoghurt with Alphonso mango, saffron.',price:99,rating:'4.5',reviews:'3.3k',veg:true},
+  {id:10,cat:'chai',emoji:'☕',name:'Masala Chai + Osmania Biscuits',desc:'Strong ginger-cardamom chai with Hyderabadi biscuits.',price:79,rating:'4.7',reviews:'9.8k',veg:true},
+  {id:11,cat:'chai',emoji:'🥐',name:'Vada Pav Combo',desc:'Mumbai street-style with green & dry garlic chutney.',price:49,rating:'4.5',reviews:'7.2k',veg:true},
+  {id:12,cat:'chai',emoji:'🧇',name:'Pav Bhaji Full Plate',desc:'Buttery bhaji, 4 pav buns, onion, lemon, coriander.',price:149,rating:'4.6',reviews:'5.5k',veg:true},
+];
+
+// State
+let cart = {};
+let currentCat = 'all';
+let userLocation = null; // {lat, lng, name}
+let restaurantLocation = null;
+let etaMinutes = 30;
+let distanceKm = 2.5;
+let map, riderMarker, trackingInterval;
+let streak = parseInt(localStorage.getItem('na_streak') || '0');
+let searchTimeout = null;
+
+// ─── LOCATION ───────────────────────────────────────────
+function detectLocation() {
+  const detecting = document.getElementById('loc-detecting');
+  detecting.style.display = 'flex';
+  if (!navigator.geolocation) {
+    alert('Geolocation not supported. Please search manually.');
+    detecting.style.display = 'none';
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    async pos => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      const name = await reverseGeocode(lat, lng);
+      setUserLocation(lat, lng, name);
+      detecting.style.display = 'none';
+    },
+    err => {
+      detecting.style.display = 'none';
+      alert('Could not get location. Please search manually.');
+    },
+    { timeout: 8000 }
+  );
+}
+
+async function reverseGeocode(lat, lng) {
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
+    const d = await r.json();
+    const a = d.address;
+    return a.suburb || a.neighbourhood || a.city_district || a.city || a.town || 'Your location';
+  } catch(e) {
+    return 'Your location';
+  }
+}
+
+function searchLocation(query) {
+  clearTimeout(searchTimeout);
+  const box = document.getElementById('loc-suggestions');
+  if (query.length < 3) { box.style.display = 'none'; return; }
+  searchTimeout = setTimeout(async () => {
+    try {
+      const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ', India')}&format=json&limit=5&addressdetails=1`);
+      const results = await r.json();
+      if (!results.length) { box.style.display = 'none'; return; }
+      box.innerHTML = results.map(r => {
+        const a = r.address;
+        const main = a.suburb || a.neighbourhood || a.city_district || a.city || a.town || r.display_name.split(',')[0];
+        const sub = [a.city || a.town, a.state].filter(Boolean).join(', ');
+        return `<div class="loc-suggestion" onclick="selectLocation(${r.lat}, ${r.lon}, '${main.replace(/'/g,"\\'")}')">
+          <svg class="loc-suggestion-pin" width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+          <div><div class="loc-suggestion-main">${main}</div><div class="loc-suggestion-sub">${sub}</div></div>
+        </div>`;
+      }).join('');
+      box.style.display = 'block';
+    } catch(e) { box.style.display = 'none'; }
+  }, 400);
+}
+
+function selectLocation(lat, lng, name) {
+  document.getElementById('loc-suggestions').style.display = 'none';
+  document.getElementById('loc-input').value = name;
+  setUserLocation(parseFloat(lat), parseFloat(lng), name);
+}
+
+function setUserLocation(lat, lng, name) {
+  userLocation = { lat, lng, name };
+  // Pick a fake restaurant ~1.5-4km away
+  const angle = Math.random() * 2 * Math.PI;
+  const dist = (1.5 + Math.random() * 2.5) / 111; // degrees
+  restaurantLocation = {
+    lat: lat + dist * Math.cos(angle),
+    lng: lng + dist * Math.sin(angle)
+  };
+  // Calculate ETA based on real distance
+  distanceKm = haversine(lat, lng, restaurantLocation.lat, restaurantLocation.lng);
+  const baseSpeed = 18; // avg km/h in Indian city traffic
+  const trafficMultiplier = getTrafficMultiplier();
+  etaMinutes = Math.round((distanceKm / baseSpeed) * 60 * trafficMultiplier) + 8; // +8 for prep
+  etaMinutes = Math.max(15, Math.min(60, etaMinutes));
+
+  // Update UI
+  const shortName = name.length > 18 ? name.substring(0, 18) + '…' : name;
+  document.getElementById('header-loc-name').textContent = shortName;
+  document.getElementById('eta-strip-loc').textContent = shortName;
+  document.getElementById('eta-strip-time').textContent = etaMinutes + '–' + (etaMinutes + 8) + ' min';
+  document.getElementById('cart-eta-text').textContent = etaMinutes + '–' + (etaMinutes + 8) + ' min';
+  document.getElementById('checkout-eta').textContent = etaMinutes + '–' + (etaMinutes + 8) + ' min';
+  document.getElementById('checkout-address').textContent = name;
+
+  showScreen('home');
+}
+
+function haversine(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function getTrafficMultiplier() {
+  const h = new Date().getHours();
+  if ((h >= 8 && h <= 10) || (h >= 17 && h <= 20)) return 1.6; // rush hour
+  if (h >= 12 && h <= 14) return 1.3; // lunch
+  if (h >= 22 || h <= 6) return 0.9; // late night, light traffic
+  return 1.2;
+}
+
+function getTrafficLabel() {
+  const h = new Date().getHours();
+  if ((h >= 8 && h <= 10) || (h >= 17 && h <= 20)) return 'Heavy';
+  if (h >= 12 && h <= 14) return 'Moderate';
+  if (h >= 22 || h <= 6) return 'Light';
+  return 'Moderate';
+}
+
+// ─── MENU ────────────────────────────────────────────────
+function filterCat(cat, el) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  renderItems();
+}
+
+function renderItems() {
+  const filtered = currentCat === 'all' ? MENU : MENU.filter(i => i.cat === currentCat);
+  document.getElementById('items-list').innerHTML =
+    `<div class="section-title">${currentCat === 'all' ? 'All items' : currentCat.charAt(0).toUpperCase() + currentCat.slice(1)}</div>` +
+    filtered.map(item => `
+      <div class="item-card">
+        <div class="item-inner">
+          <div class="item-img">${item.emoji}</div>
+          <div class="item-details">
+            <div class="item-veg"><span class="veg-dot" style="background:${item.veg ? '#1E8C45' : '#E53935'}"></span>${item.veg ? 'Veg' : 'Non-veg'}</div>
+            <div class="item-name">${item.name}</div>
+            <div class="item-desc">${item.desc}</div>
+            <div class="item-meta">
+              <div>
+                <div class="item-price">₹${item.price}</div>
+                <div class="item-rating">★ ${item.rating} (${item.reviews})</div>
+              </div>
+              <button class="add-btn ${cart[item.id] ? 'added' : ''}" onclick="addToCart(${item.id})">
+                ${cart[item.id] ? '✓ ' + cart[item.id] + ' added' : '+ Add'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>`).join('');
+}
+
+function addToCart(id) {
+  cart[id] = (cart[id] || 0) + 1;
+  updateCartBar();
+  renderItems();
+}
+
+function updateCartBar() {
+  const count = Object.values(cart).reduce((s,v)=>s+v, 0);
+  const total = getTotal();
+  document.getElementById('cart-count').textContent = count;
+  document.getElementById('cart-price').textContent = '₹' + total;
+  document.getElementById('cart-bar').classList.toggle('hidden', count === 0);
+}
+
+function getSubtotal() { return Object.keys(cart).reduce((s,id) => s + MENU.find(i=>i.id==id).price * cart[id], 0); }
+function getTotal() { return getSubtotal() + Math.round(getSubtotal() * 0.05); }
+
+// ─── CART ────────────────────────────────────────────────
+function goToCart() {
+  const sub = getSubtotal(), tax = Math.round(sub * 0.05), total = sub + tax;
+  document.getElementById('bill-subtotal').textContent = '₹' + sub;
+  document.getElementById('bill-tax').textContent = '₹' + tax;
+  document.getElementById('bill-total').textContent = '₹' + total;
+  document.getElementById('savings-amount').textContent = '₹' + (total + 45 + 5);
+  document.getElementById('cart-items-list').innerHTML = Object.keys(cart).map(id => {
+    const item = MENU.find(i=>i.id==id);
+    return `<div class="cart-item">
+      <div class="cart-item-emoji">${item.emoji}</div>
+      <div class="cart-item-name">${item.name}</div>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
+        <span class="qty-num">${cart[id]}</span>
+        <button class="qty-btn" onclick="changeQty(${item.id},1)">+</button>
+      </div>
+      <div class="cart-item-price">₹${item.price * cart[id]}</div>
+    </div>`;
+  }).join('');
+  showScreen('cart');
+}
+
+function changeQty(id, delta) {
+  cart[id] = Math.max(0, (cart[id]||0) + delta);
+  if (!cart[id]) delete cart[id];
+  updateCartBar();
+  if (!Object.keys(cart).length) { showScreen('home'); return; }
+  goToCart();
+}
+
+function goToCheckout() {
+  document.getElementById('checkout-total').textContent = '₹' + getTotal();
+  showScreen('checkout');
+}
+
+function selectPay(el) {
+  document.querySelectorAll('.pay-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ─── TRACKING ────────────────────────────────────────────
+function placeOrder() {
+  showScreen('tracking');
+  startTracking();
+}
+
+function startTracking() {
+  if (map) { map.remove(); map = null; }
+  if (trackingInterval) clearInterval(trackingInterval);
+
+  // Use real user location or fall back to Bengaluru
+  const dest = userLocation ? [userLocation.lat, userLocation.lng] : [12.9352, 77.6245];
+  const rest = restaurantLocation ? [restaurantLocation.lat, restaurantLocation.lng] : [12.9300, 77.6180];
+  const center = [(dest[0] + rest[0]) / 2, (dest[1] + rest[1]) / 2];
+
+  // Calculate zoom to fit both points
+  const latDiff = Math.abs(dest[0] - rest[0]);
+  const lngDiff = Math.abs(dest[1] - rest[1]);
+  const maxDiff = Math.max(latDiff, lngDiff);
+  const zoom = maxDiff < 0.01 ? 15 : maxDiff < 0.03 ? 14 : maxDiff < 0.06 ? 13 : 12;
+
+  const realDist = haversine(dest[0], dest[1], rest[0], rest[1]);
+  const displayDist = realDist.toFixed(1);
+  document.getElementById('dist-display').textContent = displayDist + ' km';
+  document.getElementById('traffic-display').textContent = getTrafficLabel();
+  document.getElementById('eta-time').textContent = etaMinutes;
+
+  setTimeout(() => {
+    map = L.map('map', { zoomControl: false, attributionControl: false }).setView(center, zoom);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    const riderIcon = L.divIcon({ html: '<div style="font-size:24px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3))">🛵</div>', iconSize:[32,32], iconAnchor:[16,16], className:'' });
+    const destIcon = L.divIcon({ html: '<div style="font-size:28px;line-height:1;">📍</div>', iconSize:[32,32], iconAnchor:[16,32], className:'' });
+    const restIcon = L.divIcon({ html: '<div style="font-size:24px;line-height:1;">🍳</div>', iconSize:[32,32], iconAnchor:[16,16], className:'' });
+
+    L.marker(rest, {icon: restIcon}).addTo(map).bindPopup('Fake Bites Cloud Kitchen');
+    L.marker(dest, {icon: destIcon}).addTo(map).bindPopup(userLocation ? userLocation.name : 'Your address');
+    // Draw route line
+    L.polyline([rest, dest], {color: '#FF4500', weight: 3, dashArray: '6,6', opacity: 0.7}).addTo(map);
+    riderMarker = L.marker(rest, {icon: riderIcon}).addTo(map);
+
+    // Timing: prep takes 40% of time, delivery 60%
+    const totalMs = etaMinutes * 60 * 1000 / 15; // speed up 15x for demo
+    const prepMs = totalMs * 0.4;
+    const deliveryMs = totalMs * 0.6;
+    const steps = 50;
+
+    // Status transitions
+    setTimeout(() => {
+      document.getElementById('s2').classList.remove('active');
+      document.getElementById('s2').classList.add('done');
+      document.getElementById('s2').textContent = '✓';
+      document.getElementById('l2').classList.add('done');
+      document.getElementById('s3').classList.remove('pending');
+      document.getElementById('s3').classList.add('active');
+    }, prepMs);
+
+    setTimeout(() => {
+      document.getElementById('s3').classList.remove('active');
+      document.getElementById('s3').classList.add('done');
+      document.getElementById('s3').textContent = '✓';
+      document.getElementById('l3').classList.add('done');
+      document.getElementById('s4').classList.remove('pending');
+      document.getElementById('s4').classList.add('done');
+      document.getElementById('s4').textContent = '✓';
+      clearInterval(trackingInterval);
+      setTimeout(showSuccess, 1500);
+    }, totalMs);
+
+    // Rider movement — starts after prep
+    let step = 0;
+    let etaLeft = etaMinutes;
+    trackingInterval = setInterval(() => {
+      step++;
+      const t = Math.min(step / steps, 1);
+      // Only move during delivery phase
+      if (step > steps * 0.4) {
+        const deliveryT = (t - 0.4) / 0.6;
+        const lat = rest[0] + (dest[0] - rest[0]) * deliveryT;
+        const lng = rest[1] + (dest[1] - rest[1]) * deliveryT;
+        riderMarker.setLatLng([lat, lng]);
+      }
+      etaLeft = Math.max(0, Math.round(etaMinutes * (1 - t)));
+      document.getElementById('eta-time').textContent = etaLeft;
+      if (step >= steps) clearInterval(trackingInterval);
+    }, totalMs / steps);
+  }, 300);
+}
+
+// ─── SUCCESS ─────────────────────────────────────────────
+function showSuccess() {
+  streak++;
+  localStorage.setItem('na_streak', streak);
+  document.getElementById('final-savings').textContent = 'You saved ₹' + (getTotal() + 50) + ' today!';
+  document.getElementById('streak-count').textContent = streak;
+  showScreen('success');
+}
+
+function shareWhatsApp() {
+  const loc = userLocation ? userLocation.name : 'my area';
+  const t = `😂 I just "ordered" food to ${loc} on NeverArrive — a fake delivery app where the food never comes!\n\n₹0 spent. Cravings handled. Diet saved.\n\nTry it → https://neverarrive.in`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(t));
+}
+function shareTwitter() {
+  const loc = userLocation ? userLocation.name : 'my doorstep';
+  const t = `Ordered biryani to ${loc} at ${new Date().getHours()}:00 and it never came (on purpose) 😂\n\nNeverArrive — India's fake food delivery app. ₹0 spent. 100% dopamine.\n\n→ https://neverarrive.in #NeverArrive #Swiggy #Zomato`;
+  window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(t));
+}
+
+function resetApp() {
+  cart = {};
+  updateCartBar();
+  renderItems();
+  showScreen('home');
+}
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// Init
+renderItems();
+</script>
+</body>
+</html>
