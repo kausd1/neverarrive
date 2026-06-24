@@ -264,7 +264,7 @@ body { font-family: 'Inter', sans-serif; background: var(--white); color: var(--
     </div>
     <div class="loc-logo" id="loc-flag">🛵</div>
     <div class="loc-title">Where are you?</div>
-    <div class="loc-sub" id="loc-sub">We calculate a realistic fake delivery time based on your actual location and real road distances.</div>
+    <div class="loc-sub" id="loc-sub">We calculate a realistic estimated delivery time based on your actual location and real road distances.</div>
     <button class="loc-detect-btn" onclick="detectLocation()">
       <svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
       Use my current location
@@ -376,7 +376,7 @@ body { font-family: 'Inter', sans-serif; background: var(--white); color: var(--
         <div style="margin-top:8px;font-size:12px;color:var(--green);font-weight:500;">✓ No real payment. No charge. Ever.</div>
       </div>
     </div>
-    <button class="confirm-btn" onclick="placeOrder()">Place order (fake) →</button>
+    <button class="confirm-btn" onclick="placeOrder()">Place order →</button>
   </div>
 </div>
 
@@ -418,7 +418,7 @@ body { font-family: 'Inter', sans-serif; background: var(--white); color: var(--
   </div>
   <div style="padding:0 16px 32px;">
     <div style="background:var(--orange-light);border-radius:var(--radius);padding:14px 16px;font-size:13px;color:var(--orange-dark);line-height:1.6;">
-      <strong>Heads up:</strong> This is a fake order. No food is coming, no money was charged. Enjoy the dopamine! 🧠✨
+      <strong>Heads up:</strong> Your order is on its way. Sit back and enjoy. 🛵
     </div>
   </div>
 </div>
@@ -461,7 +461,7 @@ const COUNTRIES = {
       {icon:'📱', label:'UPI'}, {icon:'💳', label:'Card'},
       {icon:'💵', label:'Cash'}, {icon:'🏦', label:'Net Banking'},
     ],
-    restaurantName: 'Fake Bites Cloud Kitchen',
+    restaurantName: 'NeverArrive Kitchen',
     categories: [
       {id:'curry', label:'🍲 Dal & Curries'},
       {id:'breads', label:'🫓 Breads & Rice'},
@@ -616,7 +616,7 @@ const COUNTRIES = {
     taxLabel: 'VAT (20%)', taxRate: 0.20,
     avgSpeedKmh: 20, searchRegion: 'United Kingdom',
     searchPlaceholder: 'Search curry, fish & chips, Sunday roast...',
-    bannerTitle: 'Fakeaway night',
+    bannerTitle: "Tonight's order",
     bannerSub: 'All the takeaway feels. None of the £45 Deliveroo bill. The food never comes.',
     riders: [
       {name:'James Fletcher', vehicle:'Yamaha scooter', rating:'4.8', avatar:'🧑'},
@@ -758,7 +758,7 @@ function goToLocation() {
   const c = COUNTRIES[selectedCountry];
   document.getElementById('loc-flag').textContent = c.flag;
   document.getElementById('loc-input').placeholder = 'Search in ' + c.name + '...';
-  document.getElementById('loc-sub').textContent = 'Searching in ' + c.name + '. We calculate a realistic fake delivery time based on your real location.';
+  document.getElementById('loc-sub').textContent = 'Searching in ' + c.name + '. We calculate a realistic estimated delivery time based on your real location.';
   showScreen('location');
 }
 
