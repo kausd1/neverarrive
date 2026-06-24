@@ -185,53 +185,63 @@ body { font-family: 'Inter', sans-serif; background: var(--white); color: var(--
 <body>
 
 <!-- SCREEN 0: COUNTRY PICKER -->
-<div class="screen" id="screen-country">
+<div class="screen active" id="screen-country">
   <div class="country-screen">
     <div class="brand-logo">🛵</div>
     <div class="brand-title">NeverArrive</div>
     <div class="brand-sub">Order anything. Feel the dopamine. The food never comes — and that's the whole point.</div>
+    <div style="font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Select your country</div>
     <div class="country-grid">
       <div class="country-card" onclick="selectCountry('IN', this)">
         <div class="country-flag">🇮🇳</div>
         <div class="country-name">India</div>
-        <div class="country-sub">₹ · Hindi & English</div>
+        <div class="country-sub">₹ · Dal, Biryani, Chai</div>
       </div>
       <div class="country-card" onclick="selectCountry('AU', this)">
         <div class="country-flag">🇦🇺</div>
         <div class="country-name">Australia</div>
-        <div class="country-sub">A$ · English</div>
+        <div class="country-sub">A$ · Smashed Avo, Burgers</div>
       </div>
       <div class="country-card" onclick="selectCountry('US', this)">
         <div class="country-flag">🇺🇸</div>
         <div class="country-name">United States</div>
-        <div class="country-sub">$ · English</div>
+        <div class="country-sub">$ · Burgers, Tacos, Pizza</div>
       </div>
       <div class="country-card" onclick="selectCountry('UK', this)">
         <div class="country-flag">🇬🇧</div>
         <div class="country-name">United Kingdom</div>
-        <div class="country-sub">£ · English</div>
+        <div class="country-sub">£ · Fish & Chips, Curry</div>
       </div>
       <div class="country-card" onclick="selectCountry('SG', this)">
         <div class="country-flag">🇸🇬</div>
         <div class="country-name">Singapore</div>
-        <div class="country-sub">S$ · English</div>
+        <div class="country-sub">S$ · Laksa, Chicken Rice</div>
       </div>
       <div class="country-card" onclick="selectCountry('AE', this)">
         <div class="country-flag">🇦🇪</div>
         <div class="country-name">UAE</div>
-        <div class="country-sub">AED · English</div>
+        <div class="country-sub">AED · Shawarma, Mandi</div>
+      </div>
+      <div class="country-card" onclick="selectCountry('JP', this)">
+        <div class="country-flag">🇯🇵</div>
+        <div class="country-name">Japan</div>
+        <div class="country-sub">¥ · Ramen, Sushi, Donburi</div>
       </div>
     </div>
-    <button class="continue-btn" id="continue-btn" onclick="goToLocation()">Continue →</button>
+    <button class="continue-btn" id="continue-btn" onclick="goToLocation()">Choose your location →</button>
   </div>
 </div>
 
 <!-- SCREEN 1: LOCATION -->
-<div class="screen active" id="screen-location">
+<div class="screen" id="screen-location">
   <div class="loc-screen">
+    <div class="back-small" onclick="showScreen('country')">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+      Change country
+    </div>
     <div class="loc-logo" id="loc-flag">🛵</div>
     <div class="loc-title">Where are you?</div>
-    <div class="loc-sub">We calculate a realistic fake delivery time based on your actual location and real road distances.</div>
+    <div class="loc-sub" id="loc-sub">We calculate a realistic fake delivery time based on your actual location and real road distances.</div>
     <button class="loc-detect-btn" onclick="detectLocation()">
       <svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
       Use my current location
@@ -458,11 +468,12 @@ const COUNTRIES = {
     avgSpeedKmh: 30, searchRegion: 'Australia',
     searchPlaceholder: 'Search burgers, poke bowls, brunch...',
     bannerTitle: 'No-spend food browsing',
-    bannerSub: 'Browse, add to cart, order — nothing arrives. Dopamine on a budget.',
+    bannerSub: 'All the Uber Eats feels. A$0 spent. Nothing arrives. Dopamine on a budget.',
     riders: [
       {name:'Jack Mitchell', vehicle:'Trek bicycle', rating:'4.9', avatar:'🚴'},
       {name:'Liam O\'Brien', vehicle:'Yamaha scooter', rating:'4.7', avatar:'🧑'},
       {name:'Noah Williams', vehicle:'Rad Power e-bike', rating:'4.8', avatar:'👨'},
+      {name:'Ethan Clarke', vehicle:'Honda scooter', rating:'4.8', avatar:'🧔'},
     ],
     payOptions: [
       {icon:'💳', label:'Card'}, {icon:'📱', label:'Apple Pay'},
@@ -470,25 +481,72 @@ const COUNTRIES = {
     ],
     restaurantName: 'Phantom Bites Kitchen',
     categories: [
-      {id:'brunch', label:'🥞 Brunch'},
+      {id:'brunch', label:'🥞 Brekkie & Brunch'},
       {id:'mains', label:'🍔 Mains'},
-      {id:'bowls', label:'🥗 Bowls & Salads'},
+      {id:'bowls', label:'🥗 Bowls & Wraps'},
       {id:'sweets', label:'☕ Coffee & Sweets'},
     ],
     menu: [
-      {id:1,cat:'brunch',emoji:'🥞',name:'Smashed Avo on Sourdough',desc:'Whipped ricotta, heirloom tomatoes, dukkah, lemon. Classic.',price:22,rating:'4.7',reviews:'8.2k'},
-      {id:2,cat:'brunch',emoji:'🍳',name:'Big Brekkie Plate',desc:'Two eggs your way, bacon, mushrooms, hash brown, toast.',price:28,rating:'4.8',reviews:'12.1k'},
-      {id:3,cat:'brunch',emoji:'🥐',name:'Acai Bowl',desc:'Frozen acai, banana, granola, blueberries, honey drizzle.',price:18,rating:'4.6',reviews:'6.4k'},
-      {id:4,cat:'mains',emoji:'🍔',name:'Wagyu Beef Burger',desc:'Wagyu patty, aged cheddar, pickles, house sauce, brioche bun.',price:24,rating:'4.9',reviews:'15.3k'},
-      {id:5,cat:'mains',emoji:'🍕',name:'Wood-fired Prawn Pizza',desc:'Tiger prawns, garlic butter, cherry tomatoes, rocket, mozzarella.',price:29,rating:'4.7',reviews:'9.8k'},
-      {id:6,cat:'mains',emoji:'🐟',name:'Barramundi Fish Tacos (3)',desc:'Crispy barramundi, slaw, chipotle mayo, pickled jalapeños.',price:26,rating:'4.8',reviews:'11.2k'},
-      {id:7,cat:'mains',emoji:'🥩',name:'Steak Sandwich',desc:'Porterhouse, caramelised onions, rocket, aioli on Turkish roll.',price:22,rating:'4.6',reviews:'7.5k'},
-      {id:8,cat:'bowls',emoji:'🥗',name:'Chicken Caesar Salad',desc:'Grilled chicken, cos lettuce, parmesan, croutons, Caesar dressing.',price:19,rating:'4.5',reviews:'5.6k'},
-      {id:9,cat:'bowls',emoji:'🍱',name:'Salmon Poke Bowl',desc:'Sashimi salmon, edamame, cucumber, avocado, ponzu dressing.',price:24,rating:'4.8',reviews:'13.7k'},
-      {id:10,cat:'bowls',emoji:'🌯',name:'Halloumi Wrap',desc:'Grilled halloumi, roast capsicum, hummus, spinach, flatbread.',price:17,rating:'4.6',reviews:'8.1k'},
-      {id:11,cat:'sweets',emoji:'☕',name:'Flat White + Almond Croissant',desc:'Single origin pour-over flat white with a buttery almond crescent.',price:14,rating:'4.9',reviews:'22.4k'},
-      {id:12,cat:'sweets',emoji:'🍦',name:'Gelato (2 scoops)',desc:'Stracciatella and salted caramel. Waffle cone. Enough said.',price:9,rating:'4.8',reviews:'18.6k'},
-      {id:13,cat:'sweets',emoji:'🍰',name:'Lamington Slice',desc:'Chocolate-dipped sponge, coconut flakes, raspberry jam layer.',price:7,rating:'4.7',reviews:'9.3k'},
+      {id:1,cat:'brunch',emoji:'🥑',name:'Smashed Avo on Sourdough',desc:'Whipped feta, heirloom tomatoes, dukkah, lemon, microherbs.',price:22,rating:'4.7',reviews:'8.2k'},
+      {id:2,cat:'brunch',emoji:'🍳',name:'Big Brekkie Plate',desc:'Two eggs your way, streaky bacon, field mushrooms, hash brown, sourdough toast.',price:28,rating:'4.8',reviews:'12.1k'},
+      {id:3,cat:'brunch',emoji:'🫐',name:'Acai Bowl',desc:'Wild acai, banana, house granola, blueberries, passionfruit, honey.',price:18,rating:'4.6',reviews:'6.4k'},
+      {id:4,cat:'brunch',emoji:'🥞',name:'Ricotta Hotcakes',desc:'Fluffy ricotta hotcakes, fresh strawberries, honeycomb butter, maple syrup.',price:24,rating:'4.9',reviews:'19.3k'},
+      {id:5,cat:'brunch',emoji:'🫔',name:'Bacon & Egg Roll',desc:'Double smoked bacon, fried egg, American cheese, sriracha mayo, milk bun.',price:14,rating:'4.9',reviews:'31.2k'},
+      {id:6,cat:'mains',emoji:'🍔',name:'Wagyu Smash Burger',desc:'Double wagyu patty, aged cheddar, dill pickles, house sauce, brioche bun.',price:26,rating:'4.9',reviews:'15.3k'},
+      {id:7,cat:'mains',emoji:'🍕',name:'Wood-fired Prawn Pizza',desc:'Tiger prawns, garlic butter, cherry tomatoes, rocket, mozzarella, chilli.',price:29,rating:'4.7',reviews:'9.8k'},
+      {id:8,cat:'mains',emoji:'🐟',name:'Barramundi & Chips',desc:'Beer-battered local barramundi, thick chips, tartare, lemon wedge.',price:26,rating:'4.8',reviews:'11.2k'},
+      {id:9,cat:'mains',emoji:'🥩',name:'Steak Sandwich',desc:'Porterhouse, caramelised onions, rocket, Swiss cheese, aioli, Turkish roll.',price:22,rating:'4.6',reviews:'7.5k'},
+      {id:10,cat:'mains',emoji:'🍗',name:'Butter Chicken Parma',desc:'Classic chicken parmigiana with butter chicken sauce, mozzarella, chips, salad.',price:28,rating:'4.8',reviews:'22.7k'},
+      {id:11,cat:'bowls',emoji:'🍱',name:'Salmon Poke Bowl',desc:'Sashimi salmon, edamame, cucumber, avocado, pickled ginger, ponzu.',price:24,rating:'4.8',reviews:'13.7k'},
+      {id:12,cat:'bowls',emoji:'🥗',name:'Chicken Caesar Salad',desc:'Grilled chicken, cos, shaved parmesan, house-made croutons, Caesar dressing.',price:19,rating:'4.5',reviews:'5.6k'},
+      {id:13,cat:'bowls',emoji:'🌯',name:'Halloumi & Roast Veg Wrap',desc:'Grilled halloumi, roast capsicum, hummus, baby spinach, flatbread.',price:17,rating:'4.6',reviews:'8.1k'},
+      {id:14,cat:'sweets',emoji:'☕',name:'Flat White + Almond Croissant',desc:'Single origin flat white, 65ml, with a flaky buttery almond croissant.',price:14,rating:'4.9',reviews:'22.4k'},
+      {id:15,cat:'sweets',emoji:'🍦',name:'Gelato (2 scoops)',desc:'Pistachio and salted caramel. House-made waffle cone.',price:9,rating:'4.8',reviews:'18.6k'},
+      {id:16,cat:'sweets',emoji:'🍰',name:'Lamington Slice',desc:'Chocolate-dipped sponge, desiccated coconut, raspberry jam layer.',price:7,rating:'4.7',reviews:'9.3k'},
+      {id:17,cat:'sweets',emoji:'🧁',name:'Tim Tam Cheesecake',desc:'Baked cheesecake on Tim Tam base, chocolate ganache, Tim Tam crumble.',price:12,rating:'4.9',reviews:'14.2k'},
+    ],
+  },
+  JP: {
+    name: 'Japan', flag: '🇯🇵', currency: '¥', currencyCode: 'JPY',
+    taxLabel: '消費税 (10%)', taxRate: 0.10,
+    avgSpeedKmh: 22, searchRegion: 'Japan',
+    searchPlaceholder: 'ラーメン、寿司、天ぷら... を検索',
+    bannerTitle: 'フードデリバリー体験',
+    bannerSub: '注文しても届きません。でも、気分はすっきり。¥0で満足。',
+    riders: [
+      {name:'Kenji Tanaka', vehicle:'電動自転車', rating:'4.9', avatar:'🚴'},
+      {name:'Hiroshi Yamamoto', vehicle:'Honda Gyro', rating:'4.8', avatar:'🧑'},
+      {name:'Yuki Sato', vehicle:'Yamaha Gear', rating:'4.9', avatar:'👨'},
+      {name:'Takeshi Ito', vehicle:'Honda Cub', rating:'4.7', avatar:'🧔'},
+    ],
+    payOptions: [
+      {icon:'📱', label:'PayPay'}, {icon:'💳', label:'Card'},
+      {icon:'💴', label:'Cash'}, {icon:'🔵', label:'Suica'},
+    ],
+    restaurantName: 'ファントム厨房',
+    categories: [
+      {id:'ramen', label:'🍜 ラーメン & 麺'},
+      {id:'sushi', label:'🍣 寿司 & 海鮮'},
+      {id:'donburi', label:'🍱 丼 & 定食'},
+      {id:'sweets', label:'🍡 デザート & 飲み物'},
+    ],
+    menu: [
+      {id:1,cat:'ramen',emoji:'🍜',name:'濃厚豚骨ラーメン',desc:'12時間炊いた豚骨スープ、チャーシュー、煮卵、海苔、ネギ。',price:980,rating:'4.9',reviews:'42.1k'},
+      {id:2,cat:'ramen',emoji:'🍜',name:'醤油ラーメン',desc:'鶏ガラ醤油ベース、鳴門巻き、メンマ、チャーシュー。',price:850,rating:'4.7',reviews:'28.3k'},
+      {id:3,cat:'ramen',emoji:'🍜',name:'味噌ラーメン',desc:'北海道風赤味噌スープ、コーン、バター、もやし。',price:920,rating:'4.8',reviews:'19.6k'},
+      {id:4,cat:'ramen',emoji:'🍝',name:'つけ麺',desc:'濃厚魚介豚骨つけ汁、太麺、チャーシュー、煮卵。',price:1050,rating:'4.9',reviews:'31.4k'},
+      {id:5,cat:'ramen',emoji:'🍜',name:'担々麺',desc:'四川風ピリ辛ごまスープ、挽き肉、青梗菜、ラー油。',price:990,rating:'4.8',reviews:'16.7k'},
+      {id:6,cat:'sushi',emoji:'🍣',name:'特上握り10貫',desc:'大トロ、中トロ、ウニ、イクラ、ホタテ、エビなど旬のネタ。',price:3200,rating:'4.9',reviews:'8.4k'},
+      {id:7,cat:'sushi',emoji:'🍱',name:'海鮮丼',desc:'マグロ、サーモン、ハマチ、イクラ、ウニの豪華丼。酢飯。',price:1800,rating:'4.8',reviews:'12.3k'},
+      {id:8,cat:'sushi',emoji:'🍣',name:'サーモン尽くし盛り',desc:'サーモン握り、炙りサーモン、サーモンアボカド巻き。',price:1400,rating:'4.7',reviews:'18.9k'},
+      {id:9,cat:'donburi',emoji:'🍱',name:'カツ丼',desc:'サクサク豚カツ、甘辛だし、玉子とじ、ご飯。定番の一品。',price:950,rating:'4.9',reviews:'38.2k'},
+      {id:10,cat:'donburi',emoji:'🍱',name:'親子丼',desc:'鶏もも肉と玉子の甘辛煮、三つ葉、ご飯。やさしい味。',price:850,rating:'4.8',reviews:'29.7k'},
+      {id:11,cat:'donburi',emoji:'🍛',name:'チキンカレー',desc:'じっくり煮込んだチキンカレー、福神漬け、ご飯。日本式。',price:880,rating:'4.7',reviews:'22.4k'},
+      {id:12,cat:'donburi',emoji:'🍱',name:'唐揚げ定食',desc:'ジューシー醤油唐揚げ3個、ご飯、味噌汁、小鉢、漬物。',price:920,rating:'4.9',reviews:'44.1k'},
+      {id:13,cat:'sweets',emoji:'🍡',name:'みたらし団子 (3本)',desc:'焼き醤油だれの串団子。もちもち食感。',price:320,rating:'4.8',reviews:'19.3k'},
+      {id:14,cat:'sweets',emoji:'🍵',name:'抹茶パフェ',desc:'抹茶アイス、白玉、小豆、ほうじ茶ゼリー、生クリーム。',price:680,rating:'4.9',reviews:'27.6k'},
+      {id:15,cat:'sweets',emoji:'🧋',name:'タピオカミルクティー',desc:'濃厚ミルクティー、もちもちタピオカ、黒糖シロップ。',price:580,rating:'4.8',reviews:'31.2k'},
+      {id:16,cat:'sweets',emoji:'☕',name:'缶コーヒー + 肉まん',desc:'定番の缶コーヒーと熱々の肉まん。コンビニの神コンボ。',price:380,rating:'4.9',reviews:'52.1k'},
     ],
   },
   US: {
@@ -668,13 +726,16 @@ function selectCountry(code, el) {
   document.querySelectorAll('.country-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   document.getElementById('continue-btn').classList.add('ready');
+  // Auto-proceed after short delay for snappiness
+  // (user can still tap button instead)
 }
 
 function goToLocation() {
   if (!selectedCountry) return;
   const c = COUNTRIES[selectedCountry];
   document.getElementById('loc-flag').textContent = c.flag;
-  document.getElementById('loc-search-input') && (document.getElementById('loc-input').placeholder = 'Search in ' + c.name + '...');
+  document.getElementById('loc-input').placeholder = 'Search in ' + c.name + '...';
+  document.getElementById('loc-sub').textContent = 'Searching in ' + c.name + '. We calculate a realistic fake delivery time based on your real location.';
   showScreen('location');
 }
 
@@ -720,7 +781,7 @@ function searchLocation(query) {
   box.innerHTML = '<div style="padding:12px 16px;font-size:13px;color:var(--muted);">Searching...</div>';
   box.style.display = 'block';
 
-  const countryFilter = {IN:'in',AU:'au',US:'us',UK:'gb',SG:'sg',AE:'ae'}[selectedCountry] || '';
+  const countryFilter = {IN:'in',AU:'au',US:'us',UK:'gb',SG:'sg',AE:'ae',JP:'jp'}[selectedCountry] || '';
 
   searchTimeout = setTimeout(async () => {
     try {
@@ -774,22 +835,14 @@ function detectCountryFromCoords(lat, lng) {
   if (lat >= 49 && lat <= 61 && lng >= -8 && lng <= 2) return 'UK';    // UK
   if (lat >= 1.1 && lat <= 1.5 && lng >= 103 && lng <= 104) return 'SG'; // Singapore
   if (lat >= 22 && lat <= 26 && lng >= 51 && lng <= 56) return 'AE';   // UAE
+  if (lat >= 24 && lat <= 46 && lng >= 122 && lng <= 146) return 'JP';  // Japan
   return 'IN'; // default
 }
 
 async function setUserLocation(lat, lng, name) {
   userLocation = { lat, lng, name };
-  // Auto-detect country if not already selected
-  if (!selectedCountry) {
-    selectedCountry = detectCountryFromCoords(lat, lng);
-  } else {
-    // Re-detect based on actual coordinates (user might search different country)
-    const detected = detectCountryFromCoords(lat, lng);
-    if (detected !== selectedCountry) {
-      selectedCountry = detected;
-    }
-  }
-  const c = COUNTRIES[selectedCountry];
+  // Use the country the user picked — don't override it
+  const c = COUNTRIES[selectedCountry] || COUNTRIES['IN'];
 
   // Place restaurant 1.5–3km away
   const angle = Math.random() * 2 * Math.PI;
