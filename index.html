@@ -1052,11 +1052,12 @@ function startTracking() {
 
     map.fitBounds(L.latLngBounds(path).pad(0.2));
 
-    // ── TIMING: real wall-clock minutes, 30x speedup for demo ──
-    const totalMs   = etaMinutes * 60 * 1000 / 3; // 3x speedup — 30 mins feels like 10
+    // ── TIMING: 3x speedup — 30 mins feels like 10 mins ──
+    const SPEEDUP   = 3;
+    const totalMs   = (etaMinutes * 60 * 1000) / SPEEDUP;
     const prepMs    = totalMs * 0.35;
-    const STEPS     = etaMinutes * 60; // one step per second
-    const stepMs    = 1000; // tick every 1 second
+    const STEPS     = 300;
+    const stepMs    = totalMs / STEPS;
 
     // Prep → On the way
     setTimeout(() => {
