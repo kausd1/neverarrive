@@ -185,7 +185,7 @@ body { font-family: 'Inter', sans-serif; background: var(--white); color: var(--
 <body>
 
 <!-- SCREEN 0: COUNTRY PICKER -->
-<div class="screen active" id="screen-country">
+<div class="screen" id="screen-country">
   <div class="country-screen">
     <div class="brand-logo">🛵</div>
     <div class="brand-title">NeverArrive</div>
@@ -227,13 +227,9 @@ body { font-family: 'Inter', sans-serif; background: var(--white); color: var(--
 </div>
 
 <!-- SCREEN 1: LOCATION -->
-<div class="screen" id="screen-location">
+<div class="screen active" id="screen-location">
   <div class="loc-screen">
-    <div class="back-small" onclick="showScreen('country')">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
-      Change country
-    </div>
-    <div class="loc-logo" id="loc-flag">📍</div>
+    <div class="loc-logo" id="loc-flag">🛵</div>
     <div class="loc-title">Where are you?</div>
     <div class="loc-sub">We calculate a realistic fake delivery time based on your actual location and real road distances.</div>
     <button class="loc-detect-btn" onclick="detectLocation()">
@@ -654,7 +650,7 @@ const COUNTRIES = {
 };
 
 // ─── STATE ─────────────────────────────────────────────────
-let selectedCountry = null;
+let selectedCountry = 'IN'; // default, auto-updated from GPS
 let userLocation = null;
 let restaurantLocation = null;
 let routeCoords = null;
@@ -690,6 +686,11 @@ function detectLocation() {
   navigator.geolocation.getCurrentPosition(
     async pos => {
       const {latitude:lat, longitude:lng} = pos.coords;
+      // Auto-detect country from coordinates
+      const detectedCountry = detectCountryFromCoords(lat, lng);
+      if (!selectedCountry) {
+        selectedCountry = detectedCountry;
+      }
       const name = await reverseGeocode(lat, lng);
       el.style.display = 'none';
       await setUserLocation(lat, lng, name);
@@ -701,25 +702,16 @@ function detectLocation() {
 
 async function reverseGeocode(lat, lng) {
   try {
-    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
-    const d = await r.json();
-    const a = d.address;
-    return a.suburb || a.neighbourhood || a.city_district || a.city || a.town || 'Your location';
-  } catch(e) { return 'Your location'; }
+    const res = await fetch(`/api/search?reverse=1&lat=${lat}&lon=${lng}`);
+    const data = await res.json();
+    const p = data.features?.[0]?.properties;
+    if (p) return p.suburb || p.neighbourhood || p.district || p.city || p.town || 'Your location';
+  } catch(e) {}
+  return 'Your location';
 }
 
-// ── Google Places via fetch (CORS-safe) ───────────────────
-const GKEY = 'AIzaSyBwtwdK_87aEAIRBfWO8MKsTF_zo1v2nTE';
-let _ac = null, _ps = null;
-
-function _getAC() {
-  if (_ac) return _ac;
-  if (window.google?.maps?.places) {
-    _ac = new google.maps.places.AutocompleteService();
-    _ps = new google.maps.places.PlacesService(document.createElement('div'));
-  }
-  return _ac;
-}
+// ── Geoapify Search ────────────────────────────────────────
+// API key is server-side only
 
 function searchLocation(query) {
   clearTimeout(searchTimeout);
@@ -727,127 +719,76 @@ function searchLocation(query) {
   if (query.length < 2) { box.style.display='none'; return; }
   box.innerHTML = '<div style="padding:12px 16px;font-size:13px;color:var(--muted);">Searching...</div>';
   box.style.display = 'block';
-  const cc = {IN:'in',AU:'au',US:'us',UK:'gb',SG:'sg',AE:'ae'}[selectedCountry] || 'in';
-  const region = selectedCountry ? COUNTRIES[selectedCountry].searchRegion : '';
+
+  const countryFilter = {IN:'in',AU:'au',US:'us',UK:'gb',SG:'sg',AE:'ae'}[selectedCountry] || '';
 
   searchTimeout = setTimeout(async () => {
-    // Try Google Places Autocomplete API via fetch (works without JS SDK)
     try {
-      const gRes = await fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&components=country:${cc}&key=${GKEY}&types=geocode|establishment`,
-        { signal: AbortSignal.timeout(3000) }
-      );
-      if (gRes.ok) {
-        const gData = await gRes.json();
-        if (gData.status === 'OK' && gData.predictions?.length) {
-          box.innerHTML = gData.predictions.map(p => {
-            const main = p.structured_formatting.main_text;
-            const sub  = p.structured_formatting.secondary_text || '';
-            return `<div class="loc-suggestion" onclick="selectSuggestion('${p.place_id}','${main.replace(/'/g,"\'").replace(/"/g,"&quot;")}')">
-              <svg class="loc-suggestion-pin" width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
-              <div><div class="loc-suggestion-main">${main}</div><div class="loc-suggestion-sub">${sub}</div></div>
-            </div>`;
-          }).join('');
-          box.style.display = 'block';
-          return;
-        }
+      const url = `/api/search?q=${encodeURIComponent(query)}&country=${countryFilter}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const features = data.features || [];
+
+      if (!features.length) {
+        box.innerHTML = '<div style="padding:14px 16px;font-size:13px;color:var(--muted);">No results found. Try GPS above or a nearby landmark.</div>';
+        return;
       }
-    } catch(e) { /* fall through to JS SDK or Nominatim */ }
 
-    // Try Google JS SDK
-    const ac = _getAC();
-    if (ac) {
-      ac.getPlacePredictions({
-        input: query,
-        componentRestrictions: { country: cc },
-        types: ['geocode', 'establishment']
-      }, (predictions, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && predictions?.length) {
-          box.innerHTML = predictions.map(p => {
-            const main = p.structured_formatting.main_text;
-            const sub  = p.structured_formatting.secondary_text || '';
-            return `<div class="loc-suggestion" onclick="selectSuggestion('${p.place_id}','${main.replace(/'/g,"\'").replace(/"/g,"&quot;")}')">
-              <svg class="loc-suggestion-pin" width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
-              <div><div class="loc-suggestion-main">${main}</div><div class="loc-suggestion-sub">${sub}</div></div>
-            </div>`;
-          }).join('');
-          box.style.display = 'block';
-          return;
-        }
-        // Fall to Nominatim
-        searchNominatim(query, region, box);
-      });
-      return;
-    }
-
-    // Fallback: Nominatim
-    searchNominatim(query, region, box);
-  }, 300);
-}
-
-function searchNominatim(query, region, box) {
-  fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query+', '+region)}&format=json&limit=5&addressdetails=1`)
-    .then(r => r.json())
-    .then(results => {
-      if (!results.length) { box.innerHTML='<div style="padding:14px 16px;font-size:13px;color:var(--muted);">No results found. Try GPS above.</div>'; return; }
-      box.innerHTML = results.map(r => {
-        const a = r.address;
-        const main = a.suburb||a.neighbourhood||a.city_district||a.city||a.town||r.display_name.split(',')[0];
-        const sub = [a.city||a.town, a.state].filter(Boolean).join(', ');
-        return `<div class="loc-suggestion" onclick="selectNominatim(${r.lat},${r.lon},'${main.replace(/'/g,"\'")}')">
+      box.innerHTML = features.map(f => {
+        const p = f.properties;
+        const main = p.name || p.street || p.suburb || p.city || p.formatted?.split(',')[0] || '';
+        const parts = [p.suburb || p.district, p.city || p.town, p.state, p.country].filter(Boolean);
+        // Remove duplicate of main from parts
+        const sub = parts.filter(x => x !== main).slice(0,3).join(', ');
+        const lat = f.geometry.coordinates[1];
+        const lng = f.geometry.coordinates[0];
+        return `<div class="loc-suggestion" onclick="selectGeoapify(${lat}, ${lng}, '${main.replace(/'/g,"\'").replace(/"/g,"&quot;")}', '${sub.replace(/'/g,"\'").replace(/"/g,"&quot;")}')">
           <svg class="loc-suggestion-pin" width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
-          <div><div class="loc-suggestion-main">${main}</div><div class="loc-suggestion-sub">${sub}</div></div>
+          <div>
+            <div class="loc-suggestion-main">${main}</div>
+            <div class="loc-suggestion-sub">${sub}</div>
+          </div>
         </div>`;
       }).join('');
       box.style.display = 'block';
-    })
-    .catch(() => { box.innerHTML='<div style="padding:14px 16px;font-size:13px;color:var(--muted);">Search failed. Please use GPS above.</div>'; });
+
+    } catch(e) {
+      console.error('Search error:', e);
+      box.innerHTML = '<div style="padding:14px 16px;font-size:13px;color:var(--muted);">Search failed. Please use GPS above.</div>';
+    }
+  }, 350);
 }
 
-function selectSuggestion(placeId, name) {
+async function selectGeoapify(lat, lng, name, sub) {
   document.getElementById('loc-suggestions').style.display = 'none';
-  document.getElementById('loc-input').value = name;
-
-  // Try fetch-based place details first
-  fetch(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry,name&key=${GKEY}`)
-    .then(r => r.json())
-    .then(async data => {
-      if (data.status === 'OK' && data.result?.geometry) {
-        const lat = data.result.geometry.location.lat;
-        const lng = data.result.geometry.location.lng;
-        await setUserLocation(lat, lng, data.result.name || name);
-        return;
-      }
-      // Fall to JS SDK
-      const ps = _ps || (_getAC() && _ps);
-      if (ps) {
-        ps.getDetails({ placeId, fields: ['geometry','name'] }, async (place, status) => {
-          if (status === google.maps.places.PlacesServiceStatus.OK && place.geometry) {
-            await setUserLocation(place.geometry.location.lat(), place.geometry.location.lng(), place.name || name);
-          }
-        });
-      }
-    })
-    .catch(() => {
-      const ps = _ps || (_getAC() && _ps);
-      if (ps) {
-        ps.getDetails({ placeId, fields: ['geometry','name'] }, async (place, status) => {
-          if (status === google.maps.places.PlacesServiceStatus.OK && place.geometry) {
-            await setUserLocation(place.geometry.location.lat(), place.geometry.location.lng(), place.name || name);
-          }
-        });
-      }
-    });
+  document.getElementById('loc-input').value = name + (sub ? ', ' + sub : '');
+  await setUserLocation(lat, lng, name);
 }
 
-async function selectNominatim(lat, lng, name) {
-  document.getElementById('loc-suggestions').style.display = 'none';
-  document.getElementById('loc-input').value = name;
-  await setUserLocation(parseFloat(lat), parseFloat(lng), name);
+// Auto-detect country from GPS coords
+function detectCountryFromCoords(lat, lng) {
+  // Simple bounding box detection
+  if (lat >= 6 && lat <= 37 && lng >= 68 && lng <= 97) return 'IN';   // India
+  if (lat >= -44 && lat <= -10 && lng >= 113 && lng <= 154) return 'AU'; // Australia
+  if (lat >= 24 && lat <= 50 && lng >= -125 && lng <= -66) return 'US'; // USA
+  if (lat >= 49 && lat <= 61 && lng >= -8 && lng <= 2) return 'UK';    // UK
+  if (lat >= 1.1 && lat <= 1.5 && lng >= 103 && lng <= 104) return 'SG'; // Singapore
+  if (lat >= 22 && lat <= 26 && lng >= 51 && lng <= 56) return 'AE';   // UAE
+  return 'IN'; // default
 }
 
 async function setUserLocation(lat, lng, name) {
   userLocation = { lat, lng, name };
+  // Auto-detect country if not already selected
+  if (!selectedCountry) {
+    selectedCountry = detectCountryFromCoords(lat, lng);
+  } else {
+    // Re-detect based on actual coordinates (user might search different country)
+    const detected = detectCountryFromCoords(lat, lng);
+    if (detected !== selectedCountry) {
+      selectedCountry = detected;
+    }
+  }
   const c = COUNTRIES[selectedCountry];
 
   // Place restaurant 1.5–3km away
@@ -1163,6 +1104,5 @@ function showScreen(name) {
   window.scrollTo(0,0);
 }
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwtwdK_87aEAIRBfWO8MKsTF_zo1v2nTE&libraries=places"></script>
 </body>
 </html>
