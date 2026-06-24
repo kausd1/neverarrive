@@ -1053,7 +1053,7 @@ function startTracking() {
     map.fitBounds(L.latLngBounds(path).pad(0.2));
 
     // ── TIMING: 3x speedup — 30 mins feels like 10 mins ──
-    const SPEEDUP   = 3;
+    const SPEEDUP   = 5; // 5x — 15 mins feels like 3 mins, 30 mins like 6 mins
     const totalMs   = (etaMinutes * 60 * 1000) / SPEEDUP;
     const prepMs    = totalMs * 0.35;
     const STEPS     = 300;
