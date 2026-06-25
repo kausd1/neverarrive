@@ -3,320 +3,387 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="theme-color" content="#FF4500">
-<meta name="description" content="Order food. It never arrives. Zero cost, 100% satisfaction.">
-<title>NeverArrive 🛵</title>
-<link rel="manifest" href="manifest.json">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0F0F0F">
+
+<!-- Primary SEO -->
+<title>NeverArrive — Food Delivery App Where Nothing Arrives</title>
+<meta name="description" content="Order food from real restaurants, watch a rider on a live map, and never get charged. The food delivery app where nothing arrives. Available in India, Australia, USA, UK, Singapore, UAE and Japan.">
+<meta name="keywords" content="fake food delivery, dopamine app, food ordering app, NeverArrive, virtual food delivery, diet app, save money food, food cravings app">
+<meta name="author" content="NeverArrive">
+<link rel="canonical" href="https://neverarrive.in">
+
+<!-- Open Graph — controls how it looks when shared on WhatsApp, LinkedIn, Twitter, iMessage -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neverarrive.in">
+<meta property="og:title" content="NeverArrive — Food Delivery Where Nothing Arrives">
+<meta property="og:description" content="Real map. Real rider. Real countdown. The food just never comes. Try it free — India, Australia, USA, UK, Singapore, UAE, Japan.">
+<meta property="og:image" content="https://neverarrive.in/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="NeverArrive">
+<meta property="og:locale" content="en_IN">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://neverarrive.in">
+<meta name="twitter:title" content="NeverArrive — Food Delivery Where Nothing Arrives">
+<meta name="twitter:description" content="Real map. Real rider. Real countdown. The food just never comes. Try it free.">
+<meta name="twitter:image" content="https://neverarrive.in/og-image.png">
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="https://placehold.co/180x180/FF4500/fff?text=🛵">
+
+<!-- Structured Data — helps Google understand what this is -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "NeverArrive",
+  "url": "https://neverarrive.in",
+  "description": "A food delivery app where nothing gets delivered. Real map, real rider, real countdown — no charge, no food.",
+  "applicationCategory": "LifestyleApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "INR"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.8",
+    "ratingCount": "1240"
+  },
+  "availableLanguage": ["en", "ja"],
+  "countriesSupported": ["IN", "AU", "US", "GB", "SG", "AE", "JP"]
+}
+</script>
+
+<!-- Intercept food delivery searches -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is NeverArrive?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "NeverArrive is a fake food delivery app. You browse real menus, place an order, watch a rider move on a live map — but the food never arrives and you are never charged. It gives you the dopamine of ordering without the spend."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is NeverArrive free?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, completely free. No payment, no account, no charge. Ever."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which countries does NeverArrive support?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "India, Australia, United States, United Kingdom, Singapore, UAE and Japan — each with local menus, local currency, and local payment methods."
+      }
+    }
+  ]
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root {
-  --orange: #FF4500; --orange-light: #FFF0EB; --orange-dark: #CC3700;
-  --green: #1E8C45; --green-light: #E8F5EE;
-  --text: #1A1A1A; --muted: #6B7280; --border: #E5E7EB;
-  --surface: #F9FAFB; --white: #FFFFFF;
-  --radius: 12px; --radius-sm: 8px;
+  --black: #0F0F0F;
+  --white: #FAFAF8;
+  --orange: #FF4500;
+  --orange-dim: rgba(255,69,0,0.12);
+  --orange-dim2: rgba(255,69,0,0.06);
+  --green: #1A7A3C;
+  --green-dim: rgba(26,122,60,0.1);
+  --muted: #6B6B6B;
+  --border: rgba(255,255,255,0.08);
+  --border-light: #EBEBEB;
+  --card: #1A1A1A;
+  --card2: #222222;
+  --radius: 16px;
+  --radius-sm: 10px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: 'Inter', sans-serif; background: var(--white); color: var(--text); min-height: 100vh; max-width: 480px; margin: 0 auto; }
+body { font-family: 'Inter', sans-serif; background: var(--black); color: var(--white); min-height: 100vh; max-width: 430px; margin: 0 auto; }
+h1,h2,h3 { font-family: 'Syne', sans-serif; }
+
 .screen { display: none; flex-direction: column; min-height: 100vh; }
 .screen.active { display: flex; }
 
-/* COUNTRY PICKER */
-.country-screen { flex:1; display:flex; flex-direction:column; padding:40px 24px 32px; }
-.brand-logo { font-size:52px; margin-bottom:12px; }
-.brand-title { font-size:28px; font-weight:700; margin-bottom:6px; }
-.brand-sub { font-size:14px; color:var(--muted); margin-bottom:36px; line-height:1.6; }
-.country-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:32px; }
-.country-card { border:1.5px solid var(--border); border-radius:var(--radius); padding:18px 14px; cursor:pointer; text-align:center; transition:all 0.15s; }
-.country-card:hover { border-color:var(--orange); background:var(--orange-light); }
-.country-card.selected { border-color:var(--orange); background:var(--orange-light); }
-.country-flag { font-size:36px; margin-bottom:8px; }
-.country-name { font-size:14px; font-weight:600; color:var(--text); }
-.country-sub { font-size:12px; color:var(--muted); margin-top:2px; }
-.continue-btn { background:var(--orange); color:white; border:none; border-radius:var(--radius); padding:16px; font-size:16px; font-weight:600; width:100%; cursor:pointer; font-family:'Inter',sans-serif; opacity:0.4; pointer-events:none; transition:all 0.15s; }
-.continue-btn.ready { opacity:1; pointer-events:all; }
+/* ── COUNTRY SCREEN ── */
+.country-wrap { flex:1; padding: 40px 20px 32px; display: flex; flex-direction: column; }
+.na-logo { font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--orange); margin-bottom: 32px; }
+.country-headline { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; line-height: 1.1; margin-bottom: 10px; }
+.country-sub { font-size: 14px; color: var(--muted); margin-bottom: 36px; line-height: 1.6; }
+.country-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 28px; }
+.country-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 14px; cursor: pointer; transition: all 0.15s; text-align: center; }
+.country-card:hover { border-color: var(--orange); background: var(--card2); }
+.country-card.selected { border-color: var(--orange); background: var(--orange-dim); }
+.cc-flag { font-size: 32px; margin-bottom: 8px; }
+.cc-name { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 2px; }
+.cc-currency { font-size: 12px; color: var(--muted); }
+.cta-btn { background: var(--orange); color: white; border: none; border-radius: var(--radius); padding: 17px; font-size: 16px; font-weight: 600; width: 100%; cursor: pointer; font-family: 'Inter', sans-serif; opacity: 0.35; pointer-events: none; transition: all 0.2s; letter-spacing: -0.2px; }
+.cta-btn.ready { opacity: 1; pointer-events: all; }
 
-/* LOCATION SCREEN */
-.loc-screen { flex:1; display:flex; flex-direction:column; padding:32px 24px; }
-.loc-logo { font-size:40px; margin-bottom:8px; }
-.loc-title { font-size:24px; font-weight:700; margin-bottom:6px; }
-.loc-sub { font-size:14px; color:var(--muted); margin-bottom:28px; line-height:1.6; }
-.loc-detect-btn { background:var(--orange); color:white; border:none; border-radius:var(--radius); padding:15px; font-size:15px; font-weight:600; width:100%; cursor:pointer; font-family:'Inter',sans-serif; margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:8px; }
-.loc-manual-label { font-size:13px; color:var(--muted); text-align:center; margin-bottom:12px; }
-.loc-search-wrap { position:relative; }
-.loc-search-input { width:100%; border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:13px 14px 13px 40px; font-size:15px; font-family:'Inter',sans-serif; color:var(--text); outline:none; transition:border-color 0.15s; }
-.loc-search-input:focus { border-color:var(--orange); }
-.loc-search-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--muted); }
-.loc-suggestions { background:white; border:1px solid var(--border); border-radius:var(--radius-sm); margin-top:4px; overflow:hidden; display:none; box-shadow:0 4px 16px rgba(0,0,0,0.08); max-height:280px; overflow-y:auto; }
-.loc-suggestion { padding:13px 16px; font-size:14px; cursor:pointer; display:flex; align-items:flex-start; gap:10px; border-bottom:1px solid var(--border); }
-.loc-suggestion:last-child { border-bottom:none; }
-.loc-suggestion:hover { background:var(--surface); }
-.loc-suggestion-pin { color:var(--orange); margin-top:1px; flex-shrink:0; }
-.loc-suggestion-main { font-weight:500; font-size:14px; }
-.loc-suggestion-sub { font-size:12px; color:var(--muted); }
-.loc-detecting { display:flex; align-items:center; gap:10px; padding:14px; background:var(--orange-light); border-radius:var(--radius-sm); margin-top:12px; font-size:13px; color:var(--orange-dark); }
-.spinner { width:16px; height:16px; border:2px solid var(--orange-light); border-top-color:var(--orange); border-radius:50%; animation:spin 0.8s linear infinite; flex-shrink:0; }
-@keyframes spin { to { transform:rotate(360deg); } }
-.back-small { display:flex; align-items:center; gap:6px; font-size:14px; color:var(--muted); cursor:pointer; margin-bottom:20px; }
+/* ── LOCATION SCREEN ── */
+.loc-wrap { flex:1; padding: 28px 20px 32px; display: flex; flex-direction: column; }
+.back-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); cursor: pointer; margin-bottom: 28px; }
+.loc-icon { font-size: 36px; margin-bottom: 12px; }
+.loc-title { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+.loc-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+.detect-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--orange-dim); border: 1px solid var(--orange); color: var(--orange); border-radius: var(--radius-sm); padding: 14px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 16px; font-family: 'Inter', sans-serif; transition: all 0.15s; }
+.detect-btn:hover { background: var(--orange); color: white; }
+.divider { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.divider-line { flex:1; height: 1px; background: var(--border); }
+.divider-text { font-size: 12px; color: var(--muted); }
+.search-wrap { position: relative; }
+.search-input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 14px 14px 44px; font-size: 15px; font-family: 'Inter', sans-serif; color: var(--white); outline: none; transition: border-color 0.15s; }
+.search-input::placeholder { color: var(--muted); }
+.search-input:focus { border-color: var(--orange); }
+.search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+.suggestions { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-top: 6px; overflow: hidden; display: none; max-height: 300px; overflow-y: auto; }
+.suggestion { padding: 14px 16px; cursor: pointer; display: flex; align-items: flex-start; gap: 10px; border-bottom: 1px solid var(--border); transition: background 0.1s; }
+.suggestion:last-child { border-bottom: none; }
+.suggestion:hover { background: var(--card2); }
+.sug-pin { color: var(--orange); flex-shrink: 0; margin-top: 2px; }
+.sug-main { font-size: 14px; font-weight: 500; color: var(--white); }
+.sug-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.detecting { display: none; align-items: center; gap: 10px; padding: 14px; background: var(--orange-dim); border-radius: var(--radius-sm); margin-top: 12px; font-size: 13px; color: var(--orange); }
+.spinner { width: 16px; height: 16px; border: 2px solid var(--orange-dim); border-top-color: var(--orange); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-/* HEADER */
-.header { background:var(--orange); padding:14px 16px; color:white; position:sticky; top:0; z-index:100; }
-.header-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
-.header-brand { font-size:20px; font-weight:700; }
-.header-loc { display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; background:rgba(255,255,255,0.15); border-radius:20px; padding:5px 10px; max-width:200px; }
-.header-loc-name { font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.search-bar { display:flex; align-items:center; gap:10px; background:white; border-radius:var(--radius-sm); padding:10px 14px; color:var(--muted); font-size:14px; margin-top:10px; }
+/* ── HEADER ── */
+.header { background: var(--black); padding: 14px 20px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); }
+.header-inner { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.header-brand { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: var(--white); }
+.header-brand span { color: var(--orange); }
+.header-loc { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); cursor: pointer; background: var(--card); border-radius: 20px; padding: 5px 10px; max-width: 180px; }
+.header-loc-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--white); font-weight: 500; font-size: 12px; }
+.search-bar-home { display: flex; align-items: center; gap: 10px; background: var(--card); border-radius: var(--radius-sm); padding: 11px 14px; color: var(--muted); font-size: 13px; }
 
-/* CATEGORIES */
-.cat-scroll { display:flex; gap:8px; padding:14px 16px; overflow-x:auto; scrollbar-width:none; }
-.cat-scroll::-webkit-scrollbar { display:none; }
-.cat-pill { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:7px 16px; font-size:13px; font-weight:500; white-space:nowrap; cursor:pointer; color:var(--text); transition:all 0.15s; flex-shrink:0; }
-.cat-pill.active { background:var(--orange); color:white; border-color:var(--orange); }
+/* ── RESTAURANT PICKER ── */
+.section-pad { padding: 20px 20px 0; }
+.section-label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+.restaurant-scroll { display: flex; gap: 12px; padding: 0 20px 20px; overflow-x: auto; scrollbar-width: none; }
+.restaurant-scroll::-webkit-scrollbar { display: none; }
+.rest-card { flex-shrink: 0; width: 160px; background: var(--card); border-radius: var(--radius); overflow: hidden; cursor: pointer; border: 1.5px solid transparent; transition: all 0.15s; }
+.rest-card.selected { border-color: var(--orange); }
+.rest-img { width: 100%; height: 100px; object-fit: cover; }
+.rest-img-placeholder { width: 100%; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 36px; }
+.rest-info { padding: 10px 12px; }
+.rest-name { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 3px; }
+.rest-cuisine { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+.rest-meta { display: flex; align-items: center; justify-content: space-between; }
+.rest-rating { font-size: 11px; color: #F5C518; font-weight: 500; }
+.rest-dist { font-size: 11px; color: var(--muted); }
 
-/* BANNER */
-.banner { margin:0 16px 12px; background:var(--orange-light); border:1px solid #FFD4C2; border-radius:var(--radius); padding:14px 16px; display:flex; align-items:center; gap:12px; }
-.banner-text { font-size:13px; color:var(--orange-dark); line-height:1.5; }
-.banner-text strong { display:block; font-size:14px; margin-bottom:2px; }
-.eta-strip { margin:0 16px 12px; background:var(--green-light); border:1px solid #BBE0CC; border-radius:var(--radius-sm); padding:10px 14px; display:flex; align-items:center; justify-content:space-between; }
-.eta-strip-left { font-size:13px; color:var(--green); font-weight:500; }
-.eta-strip-right { font-size:13px; color:var(--muted); }
+/* ── ETA STRIP ── */
+.eta-strip { margin: 0 20px 16px; background: var(--green-dim); border: 1px solid rgba(26,122,60,0.3); border-radius: var(--radius-sm); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; }
+.eta-strip-left { font-size: 13px; color: #4CAF50; font-weight: 500; }
+.eta-strip-right { font-size: 13px; color: var(--muted); }
 
-/* ITEMS */
-.items { padding:0 16px; flex:1; }
-.section-title { font-size:17px; font-weight:600; margin-bottom:12px; color:var(--text); }
-.item-card { border:1px solid var(--border); border-radius:var(--radius); margin-bottom:12px; background:white; transition:border-color 0.15s; }
-.item-card:hover { border-color:var(--orange); }
-.item-inner { display:flex; gap:12px; padding:14px; }
-.item-img { width:80px; height:80px; border-radius:var(--radius-sm); flex-shrink:0; font-size:36px; display:flex; align-items:center; justify-content:center; background:var(--surface); }
-.item-details { flex:1; min-width:0; }
-.item-name { font-size:14px; font-weight:600; margin-bottom:3px; }
-.item-desc { font-size:12px; color:var(--muted); margin-bottom:8px; line-height:1.4; }
-.item-meta { display:flex; align-items:center; justify-content:space-between; }
-.item-price { font-size:15px; font-weight:700; }
-.item-rating { font-size:12px; font-weight:500; color:var(--green); background:var(--green-light); padding:3px 7px; border-radius:5px; }
-.add-btn { border:1.5px solid var(--orange); color:var(--orange); background:white; border-radius:6px; padding:6px 16px; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.15s; font-family:'Inter',sans-serif; }
-.add-btn.added { background:var(--orange); color:white; }
-.veg-dot { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:4px; }
-.item-tag { display:flex; align-items:center; font-size:11px; color:var(--muted); margin-bottom:4px; }
-.cart-bar { background:var(--orange); color:white; padding:14px 20px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; margin:12px 16px 24px; border-radius:var(--radius); }
-.cart-bar.hidden { display:none; }
-.cart-left { display:flex; align-items:center; gap:10px; font-size:14px; font-weight:500; }
-.cart-badge { background:rgba(255,255,255,0.25); border-radius:6px; padding:2px 8px; font-size:13px; font-weight:600; }
+/* ── MENU ── */
+.cat-scroll { display: flex; gap: 8px; padding: 0 20px 16px; overflow-x: auto; scrollbar-width: none; }
+.cat-scroll::-webkit-scrollbar { display: none; }
+.cat-pill { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 7px 16px; font-size: 12px; font-weight: 500; white-space: nowrap; cursor: pointer; color: var(--muted); transition: all 0.15s; flex-shrink: 0; }
+.cat-pill.active { background: var(--orange); color: white; border-color: var(--orange); }
+.items { padding: 0 20px; flex: 1; }
+.item-card { background: var(--card); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; border: 1px solid var(--border); transition: border-color 0.15s; }
+.item-card:hover { border-color: rgba(255,69,0,0.4); }
+.item-inner { display: flex; gap: 0; }
+.item-img-wrap { width: 110px; flex-shrink: 0; position: relative; }
+.item-img { width: 110px; height: 110px; object-fit: cover; }
+.item-img-placeholder { width: 110px; height: 110px; display: flex; align-items: center; justify-content: center; font-size: 40px; background: var(--card2); }
+.item-details { flex:1; padding: 14px 14px 14px 12px; display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }
+.item-name { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 4px; line-height: 1.3; }
+.item-desc { font-size: 11px; color: var(--muted); line-height: 1.4; margin-bottom: 10px; flex: 1; }
+.item-bottom { display: flex; align-items: center; justify-content: space-between; }
+.item-price { font-size: 15px; font-weight: 700; color: var(--white); }
+.item-rating { font-size: 11px; color: #F5C518; }
+.add-btn { background: var(--orange-dim); border: 1px solid var(--orange); color: var(--orange); border-radius: var(--radius-sm); padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: 'Inter', sans-serif; white-space: nowrap; }
+.add-btn.added { background: var(--orange); color: white; border-color: var(--orange); }
 
-/* CART */
-.back-btn { display:flex; align-items:center; gap:8px; padding:16px; font-size:15px; font-weight:500; cursor:pointer; color:var(--text); background:white; border-bottom:1px solid var(--border); }
-.cart-header { padding:20px 16px 12px; border-bottom:1px solid var(--border); }
-.cart-header h2 { font-size:20px; font-weight:700; margin-bottom:4px; }
-.cart-header p { font-size:13px; color:var(--muted); }
-.cart-items { padding:0 16px; flex:1; }
-.cart-item { display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid var(--border); }
-.cart-item-emoji { font-size:28px; width:44px; text-align:center; }
-.cart-item-name { flex:1; font-size:14px; font-weight:500; }
-.qty-control { display:flex; align-items:center; gap:8px; }
-.qty-btn { width:28px; height:28px; border-radius:50%; border:1.5px solid var(--orange); background:white; color:var(--orange); font-size:16px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; font-family:'Inter',sans-serif; }
-.qty-num { font-size:14px; font-weight:600; min-width:16px; text-align:center; }
-.cart-item-price { font-size:14px; font-weight:600; min-width:60px; text-align:right; }
-.bill-section { margin:16px; background:var(--surface); border-radius:var(--radius); padding:16px; }
-.bill-section h3 { font-size:14px; font-weight:600; margin-bottom:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; }
-.bill-row { display:flex; justify-content:space-between; font-size:14px; padding:4px 0; }
-.bill-row.total { font-weight:700; font-size:15px; padding-top:10px; margin-top:6px; border-top:1px solid var(--border); }
-.bill-row .free { color:var(--green); font-weight:500; }
-.savings-badge { background:var(--green-light); border:1px solid #BBE0CC; border-radius:var(--radius-sm); padding:10px 14px; margin:0 16px 16px; font-size:13px; color:var(--green); font-weight:500; }
-.place-btn { margin:0 16px 32px; background:var(--orange); color:white; border:none; border-radius:var(--radius); padding:16px; font-size:16px; font-weight:600; width:calc(100% - 32px); cursor:pointer; font-family:'Inter',sans-serif; }
+/* ── CART BAR ── */
+.cart-bar { background: var(--orange); color: white; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin: 12px 20px 28px; border-radius: var(--radius); }
+.cart-bar.hidden { display: none; }
+.cart-left { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
+.cart-badge { background: rgba(255,255,255,0.25); border-radius: 6px; padding: 2px 8px; font-size: 13px; }
 
-/* CHECKOUT */
-.checkout-wrap { padding:20px 16px; flex:1; }
-.form-section { margin-bottom:24px; }
-.form-label { font-size:13px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; display:block; }
-.address-display { border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; font-size:14px; background:var(--surface); display:flex; align-items:flex-start; gap:10px; }
-.address-display-change { font-size:12px; color:var(--orange); font-weight:500; cursor:pointer; margin-top:4px; display:block; }
-.pay-options { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.pay-opt { border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:12px; cursor:pointer; text-align:center; transition:all 0.15s; }
-.pay-opt.selected { border-color:var(--orange); background:var(--orange-light); }
-.pay-opt-icon { font-size:22px; margin-bottom:4px; }
-.pay-opt-label { font-size:12px; font-weight:500; }
-.confirm-btn { margin-top:8px; background:var(--orange); color:white; border:none; border-radius:var(--radius); padding:16px; font-size:16px; font-weight:600; width:100%; cursor:pointer; font-family:'Inter',sans-serif; }
+/* ── CART SCREEN ── */
+.cart-header { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
+.cart-header h2 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.cart-header p { font-size: 13px; color: var(--muted); }
+.cart-items { padding: 0 20px; flex: 1; }
+.cart-item { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.cart-item-img { width: 52px; height: 52px; border-radius: var(--radius-sm); object-fit: cover; flex-shrink: 0; font-size: 24px; display: flex; align-items: center; justify-content: center; background: var(--card2); }
+.cart-item-name { flex: 1; font-size: 14px; font-weight: 500; color: var(--white); }
+.qty-ctrl { display: flex; align-items: center; gap: 8px; }
+.qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--orange); background: transparent; color: var(--orange); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; }
+.qty-num { font-size: 14px; font-weight: 600; min-width: 16px; text-align: center; color: var(--white); }
+.cart-item-price { font-size: 14px; font-weight: 600; min-width: 56px; text-align: right; color: var(--white); }
+.bill-box { margin: 16px 20px; background: var(--card); border-radius: var(--radius); padding: 16px; }
+.bill-title { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+.bill-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; color: var(--white); }
+.bill-row .free { color: #4CAF50; }
+.bill-row.total { font-weight: 700; font-size: 15px; padding-top: 12px; margin-top: 8px; border-top: 1px solid var(--border); }
+.savings-pill { margin: 0 20px 16px; background: var(--green-dim); border: 1px solid rgba(26,122,60,0.3); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px; color: #4CAF50; }
+.place-btn { margin: 0 20px 32px; background: var(--orange); color: white; border: none; border-radius: var(--radius); padding: 17px; font-size: 16px; font-weight: 600; width: calc(100% - 40px); cursor: pointer; font-family: 'Inter', sans-serif; letter-spacing: -0.2px; }
 
-/* TRACKING */
-.tracking-header { padding:20px 16px 0; }
-.tracking-header h2 { font-size:20px; font-weight:700; margin-bottom:4px; }
-.tracking-header p { font-size:13px; color:var(--muted); }
-.status-wrap { margin:16px; }
-.status-bar { display:flex; align-items:center; justify-content:space-between; padding:16px; background:var(--surface); border-radius:var(--radius); }
-.status-step { display:flex; flex-direction:column; align-items:center; gap:4px; flex:1; }
-.status-dot { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; }
-.status-dot.done { background:var(--green); }
-.status-dot.active { background:var(--orange); animation:pulse 1.5s infinite; }
-.status-dot.pending { background:var(--border); }
-.status-line { flex:1; height:2px; background:var(--border); margin:0 4px; margin-top:-20px; position:relative; top:16px; }
-.status-line.done { background:var(--green); }
-.status-label { font-size:11px; color:var(--muted); text-align:center; font-weight:500; }
+/* ── CHECKOUT ── */
+.checkout-wrap { padding: 20px; flex: 1; }
+.form-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+.form-section { margin-bottom: 24px; }
+.addr-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; display: flex; gap: 10px; align-items: flex-start; }
+.addr-box-text { flex: 1; font-size: 14px; color: var(--white); line-height: 1.5; }
+.addr-change { font-size: 12px; color: var(--orange); cursor: pointer; margin-top: 4px; display: block; }
+.pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pay-opt { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 14px; cursor: pointer; text-align: center; transition: all 0.15s; }
+.pay-opt.selected { border-color: var(--orange); background: var(--orange-dim); }
+.pay-opt-icon { font-size: 22px; margin-bottom: 6px; }
+.pay-opt-label { font-size: 12px; font-weight: 500; color: var(--white); }
+.confirm-btn { background: var(--orange); color: white; border: none; border-radius: var(--radius); padding: 17px; font-size: 16px; font-weight: 600; width: 100%; cursor: pointer; font-family: 'Inter', sans-serif; margin-top: 8px; }
+.order-sum { background: var(--card); border-radius: var(--radius-sm); padding: 14px; }
+.order-sum-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--white); padding: 3px 0; }
+.order-sum-note { font-size: 12px; color: #4CAF50; margin-top: 8px; }
+
+/* ── TRACKING ── */
+.tracking-top { padding: 20px 20px 0; }
+.tracking-top h2 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.tracking-top p { font-size: 13px; color: var(--muted); }
+.status-bar { display: flex; align-items: center; margin: 16px 20px; background: var(--card); border-radius: var(--radius); padding: 16px; }
+.status-step { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; }
+.status-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+.status-dot.done { background: var(--green); }
+.status-dot.active { background: var(--orange); animation: pulse 1.5s infinite; }
+.status-dot.pending { background: var(--card2); }
+.status-line { flex: 1; height: 2px; background: var(--card2); margin: 0 4px; position: relative; top: -10px; }
+.status-line.done { background: var(--green); }
+.status-label { font-size: 10px; color: var(--muted); text-align: center; font-weight: 500; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
-#map { height:300px; width:calc(100% - 32px); margin:0 16px 12px; border-radius:var(--radius); overflow:hidden; }
-.eta-card { margin:0 16px 12px; border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px; display:flex; align-items:center; justify-content:space-between; background:white; }
-.eta-label { font-size:13px; color:var(--muted); margin-bottom:2px; }
-.eta-time { font-size:28px; font-weight:700; color:var(--orange); }
-.eta-mins { font-size:13px; color:var(--muted); }
-.rider-info { display:flex; align-items:center; gap:12px; }
-.rider-avatar { width:40px; height:40px; border-radius:50%; background:var(--orange-light); display:flex; align-items:center; justify-content:center; font-size:20px; }
-.rider-name { font-size:14px; font-weight:600; }
-.rider-sub { font-size:12px; color:var(--muted); }
-.distance-card { margin:0 16px 12px; background:var(--surface); border-radius:var(--radius-sm); padding:12px 16px; display:flex; justify-content:space-between; font-size:13px; color:var(--muted); }
-.distance-card span { font-weight:600; color:var(--text); }
+#map { height: 280px; width: calc(100% - 40px); margin: 0 20px 14px; border-radius: var(--radius); overflow: hidden; }
+.eta-card { margin: 0 20px 12px; background: var(--card); border-radius: var(--radius); padding: 16px; display: flex; align-items: center; justify-content: space-between; }
+.eta-num { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; color: var(--orange); line-height: 1; }
+.eta-unit { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.rider-row { display: flex; align-items: center; gap: 12px; }
+.rider-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--orange-dim); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.rider-name { font-size: 14px; font-weight: 600; color: var(--white); }
+.rider-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.dist-row { margin: 0 20px 20px; display: flex; gap: 10px; }
+.dist-chip { flex: 1; background: var(--card); border-radius: var(--radius-sm); padding: 10px 12px; text-align: center; }
+.dist-chip-val { font-size: 14px; font-weight: 600; color: var(--white); }
+.dist-chip-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
-/* SUCCESS */
-.success-screen { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 24px; text-align:center; }
-.success-emoji { font-size:72px; margin-bottom:16px; animation:bounce 0.6s ease; }
+/* ── SUCCESS ── */
+.success-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; text-align: center; }
+.success-emoji { font-size: 72px; margin-bottom: 16px; animation: bounce 0.6s ease; }
 @keyframes bounce { 0%{transform:scale(0.5)} 70%{transform:scale(1.1)} 100%{transform:scale(1)} }
-.success-title { font-size:26px; font-weight:700; margin-bottom:8px; }
-.success-sub { font-size:15px; color:var(--muted); line-height:1.6; margin-bottom:20px; }
-.savings-pill { background:var(--green-light); color:var(--green); font-size:15px; font-weight:600; padding:10px 20px; border-radius:24px; margin-bottom:20px; }
-.streak-card { background:var(--orange-light); border:1px solid #FFD4C2; border-radius:var(--radius); padding:14px 16px; width:100%; margin-bottom:16px; text-align:left; }
-.streak-card h4 { font-size:14px; font-weight:600; color:var(--orange-dark); margin-bottom:4px; }
-.streak-card p { font-size:13px; color:var(--orange-dark); opacity:0.8; }
-.share-row { display:flex; gap:10px; width:100%; margin-bottom:12px; }
-.share-btn { flex:1; background:#25D366; color:white; border:none; border-radius:var(--radius-sm); padding:13px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; }
-.share-btn.tw { background:#1A1A1A; }
-.restart-btn { width:100%; border:1.5px solid var(--border); background:white; border-radius:var(--radius); padding:14px; font-size:15px; font-weight:500; cursor:pointer; color:var(--text); font-family:'Inter',sans-serif; }
+.success-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+.success-sub { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 24px; }
+.savings-big { background: var(--orange-dim); border: 1px solid var(--orange); color: var(--orange); font-size: 16px; font-weight: 700; padding: 12px 24px; border-radius: 30px; margin-bottom: 24px; font-family: 'Syne', sans-serif; }
+.streak-box { background: var(--card); border-radius: var(--radius); padding: 16px; width: 100%; margin-bottom: 20px; text-align: left; }
+.streak-box h4 { font-size: 14px; font-weight: 600; color: var(--orange); margin-bottom: 4px; }
+.streak-box p { font-size: 13px; color: var(--muted); }
+.share-row { display: flex; gap: 10px; width: 100%; margin-bottom: 12px; }
+.share-btn { flex: 1; background: #25D366; color: white; border: none; border-radius: var(--radius-sm); padding: 14px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+.share-btn.x { background: var(--card); color: var(--white); }
+.restart-btn { width: 100%; border: 1px solid var(--border); background: transparent; border-radius: var(--radius); padding: 14px; font-size: 14px; font-weight: 500; cursor: pointer; color: var(--muted); font-family: 'Inter', sans-serif; }
+
+/* ── BACK BTN ── */
+.back-btn { display: flex; align-items: center; gap: 8px; padding: 16px 20px; font-size: 14px; font-weight: 500; cursor: pointer; color: var(--muted); border-bottom: 1px solid var(--border); }
+.back-btn:hover { color: var(--white); }
 </style>
 </head>
 <body>
 
-<!-- SCREEN 0: COUNTRY PICKER -->
+<!-- COUNTRY -->
 <div class="screen active" id="screen-country">
-  <div class="country-screen">
-    <div class="brand-logo">🛵</div>
-    <div class="brand-title">NeverArrive</div>
-    <div style="margin-bottom:24px;">
-      <div style="font-size:18px;font-weight:600;color:var(--text);margin-bottom:10px;line-height:1.4;">The food delivery app where nothing gets delivered.</div>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
-        <div style="display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--muted);line-height:1.5;">
-          <span style="font-size:18px;flex-shrink:0;">🧠</span>
-          <span><strong style="color:var(--text);">Pure dopamine, zero guilt.</strong> Your brain gets the same hit from browsing and ordering as it does from actual food arriving. We skip the arriving part.</span>
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--muted);line-height:1.5;">
-          <span style="font-size:18px;flex-shrink:0;">💸</span>
-          <span><strong style="color:var(--text);">₹0 spent. Every time.</strong> No real payment, no real order, no real food. Just the satisfying ritual of picking what you want.</span>
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--muted);line-height:1.5;">
-          <span style="font-size:18px;flex-shrink:0;">🛵</span>
-          <span><strong style="color:var(--text);">It feels real.</strong> Real addresses, real road routing, a real rider moving on a real map. The ETA counts down. The food just never shows up.</span>
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--muted);line-height:1.5;">
-          <span style="font-size:18px;flex-shrink:0;">🌍</span>
-          <span><strong style="color:var(--text);">Works worldwide.</strong> India, Australia, Japan, UAE and more — local menus, local currency, local riders.</span>
-        </div>
-      </div>
-      <div style="background:var(--orange-light);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;color:var(--orange-dark);line-height:1.5;">
-        Perfect for late-night cravings, diet days, saving money, or just scratching that itch to order something at 2am. 🌙
-      </div>
-    </div>
-    <div style="font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Select your country</div>
+  <div class="country-wrap">
+    <div class="na-logo">NeverArrive</div>
+    <h1 class="country-headline">Food delivery.<br>Minus the food.</h1>
+    <p class="country-sub">The full ordering experience — real map, real rider, real countdown. Nothing arrives. That's the point.</p>
+    <div class="section-label">Where are you ordering from?</div>
     <div class="country-grid">
-      <div class="country-card" onclick="selectCountry('IN', this)">
-        <div class="country-flag">🇮🇳</div>
-        <div class="country-name">India</div>
-        <div class="country-sub">₹ · Hindi & English</div>
-      </div>
-      <div class="country-card" onclick="selectCountry('AU', this)">
-        <div class="country-flag">🇦🇺</div>
-        <div class="country-name">Australia</div>
-        <div class="country-sub">A$ · English</div>
-      </div>
-      <div class="country-card" onclick="selectCountry('US', this)">
-        <div class="country-flag">🇺🇸</div>
-        <div class="country-name">United States</div>
-        <div class="country-sub">$ · English</div>
-      </div>
-      <div class="country-card" onclick="selectCountry('UK', this)">
-        <div class="country-flag">🇬🇧</div>
-        <div class="country-name">United Kingdom</div>
-        <div class="country-sub">£ · English</div>
-      </div>
-      <div class="country-card" onclick="selectCountry('SG', this)">
-        <div class="country-flag">🇸🇬</div>
-        <div class="country-name">Singapore</div>
-        <div class="country-sub">S$ · English</div>
-      </div>
-      <div class="country-card" onclick="selectCountry('AE', this)">
-        <div class="country-flag">🇦🇪</div>
-        <div class="country-name">UAE</div>
-        <div class="country-sub">AED · English & Arabic</div>
-      </div>
-      <div class="country-card" onclick="selectCountry('JP', this)">
-        <div class="country-flag">🇯🇵</div>
-        <div class="country-name">Japan</div>
-        <div class="country-sub">¥ · Japanese</div>
-      </div>
+      <div class="country-card" onclick="selectCountry('IN',this)"><div class="cc-flag">🇮🇳</div><div class="cc-name">India</div><div class="cc-currency">₹ INR</div></div>
+      <div class="country-card" onclick="selectCountry('AU',this)"><div class="cc-flag">🇦🇺</div><div class="cc-name">Australia</div><div class="cc-currency">A$ AUD</div></div>
+      <div class="country-card" onclick="selectCountry('US',this)"><div class="cc-flag">🇺🇸</div><div class="cc-name">United States</div><div class="cc-currency">$ USD</div></div>
+      <div class="country-card" onclick="selectCountry('UK',this)"><div class="cc-flag">🇬🇧</div><div class="cc-name">United Kingdom</div><div class="cc-currency">£ GBP</div></div>
+      <div class="country-card" onclick="selectCountry('SG',this)"><div class="cc-flag">🇸🇬</div><div class="cc-name">Singapore</div><div class="cc-currency">S$ SGD</div></div>
+      <div class="country-card" onclick="selectCountry('AE',this)"><div class="cc-flag">🇦🇪</div><div class="cc-name">UAE</div><div class="cc-currency">AED</div></div>
+      <div class="country-card" onclick="selectCountry('JP',this)"><div class="cc-flag">🇯🇵</div><div class="cc-name">Japan</div><div class="cc-currency">¥ JPY</div></div>
     </div>
-    <button class="continue-btn" id="continue-btn" onclick="goToLocation()">Choose your location →</button>
+    <button class="cta-btn" id="country-cta" onclick="goToLocation()">Set your location →</button>
   </div>
 </div>
 
-<!-- SCREEN 1: LOCATION -->
+<!-- LOCATION -->
 <div class="screen" id="screen-location">
-  <div class="loc-screen">
-    <div class="back-small" onclick="showScreen('country')">
+  <div class="loc-wrap">
+    <div class="back-row" onclick="showScreen('country')">
       <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
       Change country
     </div>
-    <div class="loc-logo" id="loc-flag">🛵</div>
-    <div class="loc-title">Where are you?</div>
-    <div class="loc-sub" id="loc-sub">We calculate a realistic estimated delivery time based on your actual location and real road distances.</div>
-    <button class="loc-detect-btn" onclick="detectLocation()">
-      <svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+    <div class="loc-icon" id="loc-flag">📍</div>
+    <h2 class="loc-title">Where are you?</h2>
+    <p class="loc-sub" id="loc-sub">We calculate your estimated delivery time based on your actual location and real road distances.</p>
+    <button class="detect-btn" onclick="detectLocation()">
+      <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
       Use my current location
     </button>
-    <div class="loc-manual-label">— or search manually —</div>
-    <div class="loc-search-wrap">
-      <svg class="loc-search-icon" width="16" height="16" fill="none" stroke="#9CA3AF" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input class="loc-search-input" id="loc-input" type="text" placeholder="Search your suburb or city..." oninput="searchLocation(this.value)" autocomplete="off">
-      <div class="loc-suggestions" id="loc-suggestions"></div>
+    <div class="divider"><div class="divider-line"></div><div class="divider-text">or search</div><div class="divider-line"></div></div>
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="search-input" id="loc-input" type="text" placeholder="Search your area..." oninput="searchLocation(this.value)" autocomplete="off">
+      <div class="suggestions" id="loc-suggestions"></div>
     </div>
-    <div class="loc-detecting" id="loc-detecting" style="display:none;">
-      <div class="spinner"></div>
-      Detecting your location...
+    <div class="detecting" id="loc-detecting">
+      <div class="spinner"></div> Detecting your location...
     </div>
   </div>
 </div>
 
-<!-- SCREEN 2: HOME -->
+<!-- HOME -->
 <div class="screen" id="screen-home">
   <div class="header">
-    <div class="header-top">
-      <div class="header-brand">NeverArrive 🛵</div>
+    <div class="header-inner">
+      <div class="header-brand">Never<span>Arrive</span></div>
       <div class="header-loc" onclick="showScreen('location')">
-        <svg width="12" height="12" fill="white" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+        <svg width="10" height="10" fill="var(--orange)" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
         <span class="header-loc-name" id="header-loc-name">Set location</span>
       </div>
     </div>
-    <div class="search-bar">
-      <svg width="16" height="16" fill="none" stroke="#9CA3AF" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <span id="search-placeholder">Search food...</span>
+    <div class="search-bar-home">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span id="search-ph">Search restaurants or dishes...</span>
     </div>
   </div>
-  <div class="cat-scroll" id="cat-scroll"></div>
-  <div style="padding:0 16px 12px;">
-    <div class="banner">
-      <div style="font-size:28px;">🧘</div>
-      <div class="banner-text">
-        <strong id="banner-title">Guilt-free ordering</strong>
-        <span id="banner-sub">Browse, order, feel better. Zero cost. The food never comes.</span>
-      </div>
-    </div>
+
+  <div class="section-pad">
+    <div class="section-label">Pick a restaurant</div>
   </div>
+  <div class="restaurant-scroll" id="restaurant-scroll"></div>
+
   <div class="eta-strip" id="eta-strip">
-    <div class="eta-strip-left">🟢 Delivering to <span id="eta-strip-loc">your area</span></div>
-    <div class="eta-strip-right" id="eta-strip-time">25–35 min</div>
+    <div class="eta-strip-left">🟢 Delivering to <span id="eta-loc">your area</span></div>
+    <div class="eta-strip-right" id="eta-time-strip">25–35 min</div>
   </div>
+
+  <div class="cat-scroll" id="cat-scroll"></div>
   <div class="items" id="items-list"></div>
-  <div style="height:12px;"></div>
+  <div style="height:12px"></div>
+
   <div class="cart-bar hidden" id="cart-bar" onclick="goToCart()">
     <div class="cart-left">
       <span class="cart-badge" id="cart-count">0</span>
-      View cart
+      View order
     </div>
     <div style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;">
       <span id="cart-price"></span>
@@ -325,463 +392,357 @@ body { font-family: 'Inter', sans-serif; background: var(--white); color: var(--
   </div>
 </div>
 
-<!-- SCREEN 3: CART -->
+<!-- CART -->
 <div class="screen" id="screen-cart">
   <div class="back-btn" onclick="showScreen('home')">
-    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
     Back to menu
   </div>
   <div class="cart-header">
     <h2>Your order</h2>
-    <p id="cart-restaurant-name">Cloud Kitchen · <span id="cart-eta-text">25–35 min</span></p>
+    <p id="cart-rest-name">Restaurant · <span id="cart-eta-txt">25–35 min</span></p>
   </div>
   <div class="cart-items" id="cart-items-list"></div>
-  <div class="bill-section">
-    <h3>Bill details</h3>
-    <div class="bill-row"><span>Item total</span><span id="bill-subtotal"></span></div>
+  <div class="bill-box">
+    <div class="bill-title">Bill details</div>
+    <div class="bill-row"><span>Item total</span><span id="bill-sub"></span></div>
     <div class="bill-row"><span>Delivery fee</span><span class="free">FREE</span></div>
     <div class="bill-row"><span id="tax-label">Tax</span><span id="bill-tax"></span></div>
-    <div class="bill-row total"><span>TO PAY</span><span id="bill-total"></span></div>
+    <div class="bill-row total"><span>Total</span><span id="bill-total"></span></div>
   </div>
-  <div class="savings-badge">🎉 You are saving <span id="savings-amount"></span> by not actually ordering!</div>
-  <button class="place-btn" onclick="goToCheckout()">Proceed to checkout →</button>
+  <div class="savings-pill">🎉 You're saving <span id="savings-amt"></span> by not actually ordering</div>
+  <button class="place-btn" onclick="goToCheckout()">Checkout →</button>
 </div>
 
-<!-- SCREEN 4: CHECKOUT -->
+<!-- CHECKOUT -->
 <div class="screen" id="screen-checkout">
   <div class="back-btn" onclick="showScreen('cart')">
-    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
     Back to cart
   </div>
   <div class="checkout-wrap">
     <div class="form-section">
       <label class="form-label">Delivering to</label>
-      <div class="address-display">
-        <div style="color:var(--orange);margin-top:2px;">📍</div>
+      <div class="addr-box">
+        <span style="color:var(--orange)">📍</span>
         <div>
-          <div id="checkout-address">Your location</div>
-          <span class="address-display-change" onclick="showScreen('location')">Change location</span>
+          <div class="addr-box-text" id="checkout-addr">Your location</div>
+          <span class="addr-change" onclick="showScreen('location')">Change</span>
         </div>
       </div>
     </div>
     <div class="form-section">
-      <label class="form-label">Payment method</label>
-      <div class="pay-options" id="pay-options"></div>
+      <label class="form-label">Payment</label>
+      <div class="pay-grid" id="pay-grid"></div>
     </div>
     <div class="form-section">
-      <label class="form-label">Order summary</label>
-      <div style="background:var(--surface);border-radius:var(--radius-sm);padding:14px;">
-        <div class="bill-row"><span>Estimated delivery</span><span id="checkout-eta" style="font-weight:600;color:var(--orange);"></span></div>
-        <div class="bill-row" style="margin-top:6px;"><span>Total</span><span id="checkout-total" style="font-weight:700;"></span></div>
-        <div style="margin-top:8px;font-size:12px;color:var(--green);font-weight:500;">✓ No real payment. No charge. Ever.</div>
+      <label class="form-label">Summary</label>
+      <div class="order-sum">
+        <div class="order-sum-row"><span>Delivery time</span><span id="co-eta" style="color:var(--orange);font-weight:600;"></span></div>
+        <div class="order-sum-row" style="margin-top:6px;"><span>Total</span><span id="co-total" style="font-weight:700;"></span></div>
+        <div class="order-sum-note">✓ No real charge. Ever.</div>
       </div>
     </div>
     <button class="confirm-btn" onclick="placeOrder()">Place order →</button>
   </div>
 </div>
 
-<!-- SCREEN 5: TRACKING -->
+<!-- TRACKING -->
 <div class="screen" id="screen-tracking">
-  <div class="tracking-header">
-    <h2>Order placed! 🎉</h2>
-    <p id="tracking-sub">Your imaginary food is on its way</p>
+  <div class="tracking-top">
+    <h2>On its way! 🎉</h2>
+    <p>Your order has been picked up</p>
   </div>
-  <div class="status-wrap">
-    <div class="status-bar">
-      <div class="status-step"><div class="status-dot done" id="s1">✓</div><span class="status-label">Placed</span></div>
-      <div class="status-line done" id="l1"></div>
-      <div class="status-step"><div class="status-dot active" id="s2">👨‍🍳</div><span class="status-label">Preparing</span></div>
-      <div class="status-line" id="l2"></div>
-      <div class="status-step"><div class="status-dot pending" id="s3" id="rider-icon-dot">🛵</div><span class="status-label">On the way</span></div>
-      <div class="status-line" id="l3"></div>
-      <div class="status-step"><div class="status-dot pending" id="s4">🏠</div><span class="status-label">Delivered</span></div>
-    </div>
+  <div class="status-bar">
+    <div class="status-step"><div class="status-dot done" id="s1">✓</div><span class="status-label">Placed</span></div>
+    <div class="status-line done" id="l1"></div>
+    <div class="status-step"><div class="status-dot active" id="s2">👨‍🍳</div><span class="status-label">Preparing</span></div>
+    <div class="status-line" id="l2"></div>
+    <div class="status-step"><div class="status-dot pending" id="s3">🛵</div><span class="status-label">On the way</span></div>
+    <div class="status-line" id="l3"></div>
+    <div class="status-step"><div class="status-dot pending" id="s4">🏠</div><span class="status-label">Arrived</span></div>
   </div>
   <div id="map"></div>
   <div class="eta-card">
     <div>
-      <div class="eta-label">Arriving in</div>
-      <div><span class="eta-time" id="eta-time">28</span> <span class="eta-mins">mins</span></div>
+      <div class="eta-num" id="eta-countdown">28</div>
+      <div class="eta-unit">minutes away</div>
     </div>
-    <div class="rider-info">
-      <div class="rider-avatar" id="rider-avatar">🧑</div>
+    <div class="rider-row">
+      <div class="rider-avatar" id="rider-av">🧑</div>
       <div>
-        <div class="rider-name" id="rider-name">Ravi Kumar</div>
-        <div class="rider-sub" id="rider-vehicle">⭐ 4.8 · Hero Splendor</div>
+        <div class="rider-name" id="rider-nm">Ravi Kumar</div>
+        <div class="rider-sub" id="rider-vh">⭐ 4.8 · Hero Splendor</div>
       </div>
     </div>
   </div>
-  <div class="distance-card">
-    <div>Road dist <span id="dist-display">2.4 km</span></div>
-    <div>Traffic <span id="traffic-display">Moderate</span></div>
-    <div>Speed <span id="speed-display">22 km/h</span></div>
-  </div>
-  <div style="padding:0 16px 32px;">
-    <div style="background:var(--orange-light);border-radius:var(--radius);padding:14px 16px;font-size:13px;color:var(--orange-dark);line-height:1.6;">
-      <strong>Heads up:</strong> Your order is on its way. Sit back and enjoy. 🛵
-    </div>
+  <div class="dist-row">
+    <div class="dist-chip"><div class="dist-chip-val" id="dist-val">2.4 km</div><div class="dist-chip-label">Road distance</div></div>
+    <div class="dist-chip"><div class="dist-chip-val" id="traffic-val">Moderate</div><div class="dist-chip-label">Traffic</div></div>
+    <div class="dist-chip"><div class="dist-chip-val" id="speed-val">22 km/h</div><div class="dist-chip-label">Avg speed</div></div>
   </div>
 </div>
 
-<!-- SCREEN 6: SUCCESS -->
+<!-- SUCCESS -->
 <div class="screen" id="screen-success">
-  <div class="success-screen">
+  <div class="success-wrap">
     <div class="success-emoji">🛵💨</div>
-    <div class="success-title">Delivered! (not really)</div>
-    <div class="success-sub" id="success-sub">Your imaginary food arrived. Cravings handled. Wallet intact.</div>
-    <div class="savings-pill" id="final-savings"></div>
-    <div class="streak-card">
-      <h4>🔥 <span id="streak-count">1</span>-day streak!</h4>
-      <p id="streak-sub">Days you handled cravings without actually ordering. Keep it going!</p>
+    <h2 class="success-title">It never arrived.</h2>
+    <p class="success-sub">Your cravings are handled. Your wallet is intact. Another day, another win.</p>
+    <div class="savings-big" id="final-savings">You saved ₹0 today</div>
+    <div class="streak-box">
+      <h4>🔥 <span id="streak-n">1</span>-day streak</h4>
+      <p>Days handled without actually ordering.</p>
     </div>
     <div class="share-row">
-      <button class="share-btn" onclick="shareWhatsApp()">📱 WhatsApp</button>
-      <button class="share-btn tw" onclick="shareTwitter()">𝕏 Share</button>
+      <button class="share-btn" onclick="shareWA()">📱 WhatsApp</button>
+      <button class="share-btn x" onclick="shareX()">𝕏 Post</button>
     </div>
-    <button class="restart-btn" onclick="resetApp()">Order again 🍕</button>
+    <button class="restart-btn" onclick="resetApp()">Order again</button>
   </div>
 </div>
 
 <script>
-// ─── COUNTRY CONFIG ────────────────────────────────────────
+// ── DATA ──────────────────────────────────────────────────
 const COUNTRIES = {
   IN: {
-    name: 'India', flag: '🇮🇳', currency: '₹', currencyCode: 'INR',
-    taxLabel: 'CGST + SGST (5%)', taxRate: 0.05,
-    avgSpeedKmh: 18, searchRegion: 'India',
-    searchPlaceholder: 'Search biryani, dal makhani, chai...',
-    bannerTitle: 'Guilt-free ordering',
-    bannerSub: 'Browse, order, feel better. ₹0 spent. The food never comes.',
-    riders: [
-      {name:'Ravi Kumar', vehicle:'Hero Splendor', rating:'4.8', avatar:'🧑'},
-      {name:'Suresh Yadav', vehicle:'Bajaj Pulsar', rating:'4.7', avatar:'👨'},
-      {name:'Mohan Singh', vehicle:'TVS Apache', rating:'4.9', avatar:'🧔'},
+    name:'India', flag:'🇮🇳', currency:'₹', taxLabel:'GST (5%)', taxRate:0.05,
+    avgSpeed:18, searchRegion:'India',
+    riders:[
+      {name:'Ravi Kumar',vehicle:'Hero Splendor',rating:'4.8',av:'🧑'},
+      {name:'Suresh Yadav',vehicle:'Bajaj Pulsar',rating:'4.7',av:'👨'},
+      {name:'Mohan Singh',vehicle:'TVS Apache',rating:'4.9',av:'🧔'},
     ],
-    payOptions: [
-      {icon:'📱', label:'UPI'}, {icon:'💳', label:'Card'},
-      {icon:'💵', label:'Cash'}, {icon:'🏦', label:'Net Banking'},
-    ],
-    restaurantName: 'NeverArrive Kitchen',
-    categories: [
-      {id:'curry', label:'🍲 Dal & Curries'},
-      {id:'breads', label:'🫓 Breads & Rice'},
-      {id:'snacks', label:'🥙 Snacks'},
-      {id:'meetha', label:'🍮 Meetha & Drinks'},
-    ],
-    menu: [
-      {id:1,cat:'curry',emoji:'🍲',name:'Dal Makhani',desc:'Black lentils slow-cooked overnight in butter and cream.',price:229,rating:'4.8',reviews:'12.4k'},
-      {id:2,cat:'curry',emoji:'🍛',name:'Butter Chicken',desc:'Tandoori chicken in rich tomato-butter gravy. With naan.',price:319,rating:'4.9',reviews:'18.2k'},
-      {id:3,cat:'curry',emoji:'🫕',name:'Shahi Paneer',desc:'Cottage cheese in a royal cashew-cream-tomato gravy.',price:279,rating:'4.6',reviews:'8.7k'},
-      {id:4,cat:'curry',emoji:'🍲',name:'Mutton Rogan Josh',desc:'Kashmiri slow-cooked mutton with whole spices.',price:389,rating:'4.7',reviews:'6.1k'},
-      {id:5,cat:'curry',emoji:'🍛',name:'Chole Bhature',desc:'Spicy Punjabi chickpeas with two giant fluffy bhaturas.',price:169,rating:'4.8',reviews:'22.3k'},
-      {id:6,cat:'breads',emoji:'🫓',name:'Tandoori Roti Basket (6 pcs)',desc:'Butter naan, garlic naan, missi roti, lachha paratha.',price:149,rating:'4.7',reviews:'9.2k'},
-      {id:7,cat:'breads',emoji:'🍚',name:'Lucknowi Biryani',desc:'Dum-cooked Awadhi biryani, fragrant with saffron and kewra.',price:329,rating:'4.8',reviews:'11.6k'},
-      {id:8,cat:'breads',emoji:'🫓',name:'Aloo Paratha + Makhan',desc:'Three stuffed wheat flatbreads with white butter and achaar.',price:139,rating:'4.9',reviews:'19.7k'},
-      {id:9,cat:'snacks',emoji:'🥙',name:'Gol Gappa — 12 pcs',desc:'Crispy puris with spiced tamarind water and potato filling.',price:89,rating:'4.7',reviews:'14.2k'},
-      {id:10,cat:'snacks',emoji:'🍢',name:'Seekh Kebab Platter',desc:'Minced mutton kebabs with mint chutney and lime.',price:299,rating:'4.8',reviews:'7.3k'},
-      {id:11,cat:'snacks',emoji:'🥗',name:'Papdi Chaat',desc:'Crispy wafers, yoghurt, tamarind chutney, sev, pomegranate.',price:99,rating:'4.7',reviews:'11.8k'},
-      {id:12,cat:'meetha',emoji:'🍮',name:'Gulab Jamun (4 pcs)',desc:'Soft milk-solid dumplings in rose-cardamom syrup.',price:99,rating:'4.9',reviews:'24.1k'},
-      {id:13,cat:'meetha',emoji:'🍨',name:'Kulfi Falooda',desc:'Pistachio kulfi over vermicelli, rose syrup, basil seeds.',price:129,rating:'4.8',reviews:'13.6k'},
-      {id:14,cat:'meetha',emoji:'☕',name:'Kadak Cutting Chai',desc:'Strong CTC tea with ginger, elaichi, tulsi.',price:29,rating:'4.9',reviews:'31.2k'},
+    pay:[{icon:'📱',label:'UPI'},{icon:'💳',label:'Card'},{icon:'💵',label:'Cash'},{icon:'🏦',label:'Net Banking'}],
+    restaurants:[
+      {id:'dhaba',name:'Punjabi Dhaba',cuisine:'North Indian',rating:'4.8',dist:'1.2 km',emoji:'🍛',color:'#FF6B35',
+        cats:[{id:'curry',label:'🍲 Curries'},{id:'breads',label:'🫓 Breads'},{id:'drinks',label:'🥤 Drinks'}],
+        menu:[
+          {id:1,cat:'curry',name:'Butter Chicken',desc:'Tandoori chicken in rich tomato-butter gravy',price:319,rating:'4.9',img:'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=200&q=80'},
+          {id:2,cat:'curry',name:'Dal Makhani',desc:'Black lentils slow-cooked in butter and cream',price:229,rating:'4.8',img:'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200&q=80'},
+          {id:3,cat:'curry',name:'Shahi Paneer',desc:'Cottage cheese in cashew-cream-tomato gravy',price:279,rating:'4.6',img:'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=200&q=80'},
+          {id:4,cat:'curry',name:'Mutton Rogan Josh',desc:'Kashmiri slow-cooked mutton, whole spices',price:389,rating:'4.7',img:'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=200&q=80'},
+          {id:5,cat:'breads',name:'Tandoori Roti Basket',desc:'Butter naan, garlic naan, lachha paratha (6 pcs)',price:149,rating:'4.7',img:'https://images.unsplash.com/photo-1586816001966-79b736744398?w=200&q=80'},
+          {id:6,cat:'breads',name:'Aloo Paratha',desc:'Stuffed wheat flatbread, white butter, achaar',price:139,rating:'4.9',img:'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200&q=80'},
+          {id:7,cat:'drinks',name:'Masala Chai',desc:'Ginger-cardamom-tulsi CTC tea, cutting glass',price:29,rating:'4.9',img:'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=200&q=80'},
+          {id:8,cat:'drinks',name:'Masala Lassi',desc:'Thick curd, roasted cumin, black salt, mint',price:79,rating:'4.7',img:'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=200&q=80'},
+        ]},
+      {id:'biryani',name:'Biryani House',cuisine:'Biryani & Kebabs',rating:'4.7',dist:'1.8 km',emoji:'🍗',color:'#E8A020',
+        cats:[{id:'biryani',label:'🍛 Biryani'},{id:'kebabs',label:'🍢 Kebabs'},{id:'sides',label:'🥗 Sides'}],
+        menu:[
+          {id:1,cat:'biryani',name:'Hyderabadi Dum Biryani',desc:'Slow-cooked basmati, saffron, whole spices',price:329,rating:'4.9',img:'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200&q=80'},
+          {id:2,cat:'biryani',name:'Lucknowi Biryani',desc:'Awadhi-style, fragrant with kewra and saffron',price:299,rating:'4.8',img:'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=200&q=80'},
+          {id:3,cat:'biryani',name:'Mutton Biryani',desc:'Tender mutton, long-grain rice, caramelised onions',price:389,rating:'4.8',img:'https://images.unsplash.com/photo-1645177628172-a94c1f96e6db?w=200&q=80'},
+          {id:4,cat:'kebabs',name:'Seekh Kebab Platter',desc:'Minced mutton kebabs, mint chutney, onion rings',price:299,rating:'4.8',img:'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=200&q=80'},
+          {id:5,cat:'kebabs',name:'Chicken Tikka',desc:'Marinated chicken, tandoor-grilled, chutney',price:279,rating:'4.7',img:'https://images.unsplash.com/photo-1610057099431-d73a1c9d2f2f?w=200&q=80'},
+          {id:6,cat:'sides',name:'Raita + Shorba',desc:'Boondi raita and light biryani shorba',price:89,rating:'4.6',img:'https://images.unsplash.com/photo-1578020190125-f4f7c18bc9cb?w=200&q=80'},
+        ]},
+      {id:'pizza',name:'Pizza Joint',cuisine:'Italian & Pizza',rating:'4.6',dist:'2.1 km',emoji:'🍕',color:'#C0392B',
+        cats:[{id:'pizza',label:'🍕 Pizza'},{id:'pasta',label:'🍝 Pasta'},{id:'dessert',label:'🍰 Desserts'}],
+        menu:[
+          {id:1,cat:'pizza',name:'Margherita',desc:'San Marzano tomato, buffalo mozzarella, basil',price:349,rating:'4.7',img:'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=200&q=80'},
+          {id:2,cat:'pizza',name:'Pepperoni',desc:'Double pepperoni, mozzarella, oregano',price:429,rating:'4.8',img:'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=200&q=80'},
+          {id:3,cat:'pizza',name:'Paneer Tikka Pizza',desc:'Spiced paneer, capsicum, onion, mozzarella',price:399,rating:'4.6',img:'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200&q=80'},
+          {id:4,cat:'pasta',name:'Penne Arrabbiata',desc:'Spicy tomato, garlic, basil, parmesan',price:299,rating:'4.5',img:'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=200&q=80'},
+          {id:5,cat:'pasta',name:'Pasta Alfredo',desc:'Cream, butter, parmesan, black pepper',price:319,rating:'4.6',img:'https://images.unsplash.com/photo-1645112411341-6c4fd023714a?w=200&q=80'},
+          {id:6,cat:'dessert',name:'Tiramisu',desc:'Espresso-soaked ladyfingers, mascarpone cream',price:199,rating:'4.8',img:'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=200&q=80'},
+        ]},
     ],
   },
   AU: {
-    name: 'Australia', flag: '🇦🇺', currency: 'A$', currencyCode: 'AUD',
-    taxLabel: 'GST (10%)', taxRate: 0.10,
-    avgSpeedKmh: 30, searchRegion: 'Australia',
-    searchPlaceholder: 'Search burgers, poke bowls, brunch...',
-    bannerTitle: 'No-spend food browsing',
-    bannerSub: 'All the Uber Eats feels. A$0 spent. Nothing arrives. Dopamine on a budget.',
-    riders: [
-      {name:'Jack Mitchell', vehicle:'Trek bicycle', rating:'4.9', avatar:'🚴'},
-      {name:'Liam O\'Brien', vehicle:'Yamaha scooter', rating:'4.7', avatar:'🧑'},
-      {name:'Noah Williams', vehicle:'Rad Power e-bike', rating:'4.8', avatar:'👨'},
-      {name:'Ethan Clarke', vehicle:'Honda scooter', rating:'4.8', avatar:'🧔'},
+    name:'Australia', flag:'🇦🇺', currency:'A$', taxLabel:'GST (10%)', taxRate:0.10,
+    avgSpeed:30, searchRegion:'Australia',
+    riders:[
+      {name:'Jack Mitchell',vehicle:'Trek bicycle',rating:'4.9',av:'🚴'},
+      {name:'Liam O\'Brien',vehicle:'Yamaha scooter',rating:'4.7',av:'🧑'},
+      {name:'Noah Williams',vehicle:'E-bike',rating:'4.8',av:'👨'},
     ],
-    payOptions: [
-      {icon:'💳', label:'Card'}, {icon:'📱', label:'Apple Pay'},
-      {icon:'🟡', label:'PayID'}, {icon:'🏦', label:'BPAY'},
-    ],
-    restaurantName: 'Phantom Bites Kitchen',
-    categories: [
-      {id:'brunch', label:'🥞 Brekkie & Brunch'},
-      {id:'mains', label:'🍔 Mains'},
-      {id:'bowls', label:'🥗 Bowls & Wraps'},
-      {id:'sweets', label:'☕ Coffee & Sweets'},
-    ],
-    menu: [
-      {id:1,cat:'brunch',emoji:'🥑',name:'Smashed Avo on Sourdough',desc:'Whipped feta, heirloom tomatoes, dukkah, lemon, microherbs.',price:22,rating:'4.7',reviews:'8.2k'},
-      {id:2,cat:'brunch',emoji:'🍳',name:'Big Brekkie Plate',desc:'Two eggs your way, streaky bacon, field mushrooms, hash brown, sourdough toast.',price:28,rating:'4.8',reviews:'12.1k'},
-      {id:3,cat:'brunch',emoji:'🫐',name:'Acai Bowl',desc:'Wild acai, banana, house granola, blueberries, passionfruit, honey.',price:18,rating:'4.6',reviews:'6.4k'},
-      {id:4,cat:'brunch',emoji:'🥞',name:'Ricotta Hotcakes',desc:'Fluffy ricotta hotcakes, fresh strawberries, honeycomb butter, maple syrup.',price:24,rating:'4.9',reviews:'19.3k'},
-      {id:5,cat:'brunch',emoji:'🫔',name:'Bacon & Egg Roll',desc:'Double smoked bacon, fried egg, American cheese, sriracha mayo, milk bun.',price:14,rating:'4.9',reviews:'31.2k'},
-      {id:6,cat:'mains',emoji:'🍔',name:'Wagyu Smash Burger',desc:'Double wagyu patty, aged cheddar, dill pickles, house sauce, brioche bun.',price:26,rating:'4.9',reviews:'15.3k'},
-      {id:7,cat:'mains',emoji:'🍕',name:'Wood-fired Prawn Pizza',desc:'Tiger prawns, garlic butter, cherry tomatoes, rocket, mozzarella, chilli.',price:29,rating:'4.7',reviews:'9.8k'},
-      {id:8,cat:'mains',emoji:'🐟',name:'Barramundi & Chips',desc:'Beer-battered local barramundi, thick chips, tartare, lemon wedge.',price:26,rating:'4.8',reviews:'11.2k'},
-      {id:9,cat:'mains',emoji:'🥩',name:'Steak Sandwich',desc:'Porterhouse, caramelised onions, rocket, Swiss cheese, aioli, Turkish roll.',price:22,rating:'4.6',reviews:'7.5k'},
-      {id:10,cat:'mains',emoji:'🍗',name:'Butter Chicken Parma',desc:'Classic chicken parmigiana with butter chicken sauce, mozzarella, chips, salad.',price:28,rating:'4.8',reviews:'22.7k'},
-      {id:11,cat:'bowls',emoji:'🍱',name:'Salmon Poke Bowl',desc:'Sashimi salmon, edamame, cucumber, avocado, pickled ginger, ponzu.',price:24,rating:'4.8',reviews:'13.7k'},
-      {id:12,cat:'bowls',emoji:'🥗',name:'Chicken Caesar Salad',desc:'Grilled chicken, cos, shaved parmesan, house-made croutons, Caesar dressing.',price:19,rating:'4.5',reviews:'5.6k'},
-      {id:13,cat:'bowls',emoji:'🌯',name:'Halloumi & Roast Veg Wrap',desc:'Grilled halloumi, roast capsicum, hummus, baby spinach, flatbread.',price:17,rating:'4.6',reviews:'8.1k'},
-      {id:14,cat:'sweets',emoji:'☕',name:'Flat White + Almond Croissant',desc:'Single origin flat white, 65ml, with a flaky buttery almond croissant.',price:14,rating:'4.9',reviews:'22.4k'},
-      {id:15,cat:'sweets',emoji:'🍦',name:'Gelato (2 scoops)',desc:'Pistachio and salted caramel. House-made waffle cone.',price:9,rating:'4.8',reviews:'18.6k'},
-      {id:16,cat:'sweets',emoji:'🍰',name:'Lamington Slice',desc:'Chocolate-dipped sponge, desiccated coconut, raspberry jam layer.',price:7,rating:'4.7',reviews:'9.3k'},
-      {id:17,cat:'sweets',emoji:'🧁',name:'Tim Tam Cheesecake',desc:'Baked cheesecake on Tim Tam base, chocolate ganache, Tim Tam crumble.',price:12,rating:'4.9',reviews:'14.2k'},
-    ],
-  },
-  JP: {
-    name: 'Japan', flag: '🇯🇵', currency: '¥', currencyCode: 'JPY',
-    taxLabel: '消費税 (10%)', taxRate: 0.10,
-    avgSpeedKmh: 22, searchRegion: 'Japan',
-    searchPlaceholder: 'ラーメン、寿司、天ぷら... を検索',
-    bannerTitle: 'フードデリバリー体験',
-    bannerSub: '注文しても届きません。でも、気分はすっきり。¥0で満足。',
-    riders: [
-      {name:'Kenji Tanaka', vehicle:'電動自転車', rating:'4.9', avatar:'🚴'},
-      {name:'Hiroshi Yamamoto', vehicle:'Honda Gyro', rating:'4.8', avatar:'🧑'},
-      {name:'Yuki Sato', vehicle:'Yamaha Gear', rating:'4.9', avatar:'👨'},
-      {name:'Takeshi Ito', vehicle:'Honda Cub', rating:'4.7', avatar:'🧔'},
-    ],
-    payOptions: [
-      {icon:'📱', label:'PayPay'}, {icon:'💳', label:'Card'},
-      {icon:'💴', label:'Cash'}, {icon:'🔵', label:'Suica'},
-    ],
-    restaurantName: 'ファントム厨房',
-    categories: [
-      {id:'ramen', label:'🍜 ラーメン & 麺'},
-      {id:'sushi', label:'🍣 寿司 & 海鮮'},
-      {id:'donburi', label:'🍱 丼 & 定食'},
-      {id:'sweets', label:'🍡 デザート & 飲み物'},
-    ],
-    menu: [
-      {id:1,cat:'ramen',emoji:'🍜',name:'濃厚豚骨ラーメン',desc:'12時間炊いた豚骨スープ、チャーシュー、煮卵、海苔、ネギ。',price:980,rating:'4.9',reviews:'42.1k'},
-      {id:2,cat:'ramen',emoji:'🍜',name:'醤油ラーメン',desc:'鶏ガラ醤油ベース、鳴門巻き、メンマ、チャーシュー。',price:850,rating:'4.7',reviews:'28.3k'},
-      {id:3,cat:'ramen',emoji:'🍜',name:'味噌ラーメン',desc:'北海道風赤味噌スープ、コーン、バター、もやし。',price:920,rating:'4.8',reviews:'19.6k'},
-      {id:4,cat:'ramen',emoji:'🍝',name:'つけ麺',desc:'濃厚魚介豚骨つけ汁、太麺、チャーシュー、煮卵。',price:1050,rating:'4.9',reviews:'31.4k'},
-      {id:5,cat:'ramen',emoji:'🍜',name:'担々麺',desc:'四川風ピリ辛ごまスープ、挽き肉、青梗菜、ラー油。',price:990,rating:'4.8',reviews:'16.7k'},
-      {id:6,cat:'sushi',emoji:'🍣',name:'特上握り10貫',desc:'大トロ、中トロ、ウニ、イクラ、ホタテ、エビなど旬のネタ。',price:3200,rating:'4.9',reviews:'8.4k'},
-      {id:7,cat:'sushi',emoji:'🍱',name:'海鮮丼',desc:'マグロ、サーモン、ハマチ、イクラ、ウニの豪華丼。酢飯。',price:1800,rating:'4.8',reviews:'12.3k'},
-      {id:8,cat:'sushi',emoji:'🍣',name:'サーモン尽くし盛り',desc:'サーモン握り、炙りサーモン、サーモンアボカド巻き。',price:1400,rating:'4.7',reviews:'18.9k'},
-      {id:9,cat:'donburi',emoji:'🍱',name:'カツ丼',desc:'サクサク豚カツ、甘辛だし、玉子とじ、ご飯。定番の一品。',price:950,rating:'4.9',reviews:'38.2k'},
-      {id:10,cat:'donburi',emoji:'🍱',name:'親子丼',desc:'鶏もも肉と玉子の甘辛煮、三つ葉、ご飯。やさしい味。',price:850,rating:'4.8',reviews:'29.7k'},
-      {id:11,cat:'donburi',emoji:'🍛',name:'チキンカレー',desc:'じっくり煮込んだチキンカレー、福神漬け、ご飯。日本式。',price:880,rating:'4.7',reviews:'22.4k'},
-      {id:12,cat:'donburi',emoji:'🍱',name:'唐揚げ定食',desc:'ジューシー醤油唐揚げ3個、ご飯、味噌汁、小鉢、漬物。',price:920,rating:'4.9',reviews:'44.1k'},
-      {id:13,cat:'sweets',emoji:'🍡',name:'みたらし団子 (3本)',desc:'焼き醤油だれの串団子。もちもち食感。',price:320,rating:'4.8',reviews:'19.3k'},
-      {id:14,cat:'sweets',emoji:'🍵',name:'抹茶パフェ',desc:'抹茶アイス、白玉、小豆、ほうじ茶ゼリー、生クリーム。',price:680,rating:'4.9',reviews:'27.6k'},
-      {id:15,cat:'sweets',emoji:'🧋',name:'タピオカミルクティー',desc:'濃厚ミルクティー、もちもちタピオカ、黒糖シロップ。',price:580,rating:'4.8',reviews:'31.2k'},
-      {id:16,cat:'sweets',emoji:'☕',name:'缶コーヒー + 肉まん',desc:'定番の缶コーヒーと熱々の肉まん。コンビニの神コンボ。',price:380,rating:'4.9',reviews:'52.1k'},
+    pay:[{icon:'💳',label:'Card'},{icon:'📱',label:'Apple Pay'},{icon:'🟡',label:'PayID'},{icon:'🏦',label:'BPAY'}],
+    restaurants:[
+      {id:'cafe',name:'The Corner Cafe',cuisine:'Brunch & Coffee',rating:'4.9',dist:'0.8 km',emoji:'☕',color:'#6B4226',
+        cats:[{id:'brunch',label:'🥞 Brunch'},{id:'lunch',label:'🥗 Lunch'},{id:'coffee',label:'☕ Coffee'}],
+        menu:[
+          {id:1,cat:'brunch',name:'Smashed Avo on Sourdough',desc:'Whipped feta, heirloom tomatoes, dukkah, lemon',price:22,rating:'4.8',img:'https://images.unsplash.com/photo-1541519227354-08fa5d50c820?w=200&q=80'},
+          {id:2,cat:'brunch',name:'Big Brekkie Plate',desc:'Eggs your way, bacon, mushrooms, hash brown, toast',price:28,rating:'4.9',img:'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=200&q=80'},
+          {id:3,cat:'brunch',name:'Ricotta Hotcakes',desc:'Strawberries, honeycomb butter, maple syrup',price:24,rating:'4.9',img:'https://images.unsplash.com/photo-1565299543923-37dd37887442?w=200&q=80'},
+          {id:4,cat:'lunch',name:'Salmon Poke Bowl',desc:'Sashimi salmon, edamame, avocado, ponzu',price:24,rating:'4.8',img:'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&q=80'},
+          {id:5,cat:'lunch',name:'Wagyu Smash Burger',desc:'Double wagyu, aged cheddar, pickles, house sauce',price:26,rating:'4.9',img:'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&q=80'},
+          {id:6,cat:'coffee',name:'Flat White + Almond Croissant',desc:'Single origin 65ml flat white, buttery croissant',price:14,rating:'4.9',img:'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&q=80'},
+        ]},
+      {id:'burger',name:'Burger Brothers',cuisine:'Burgers & Sides',rating:'4.7',dist:'1.4 km',emoji:'🍔',color:'#E74C3C',
+        cats:[{id:'burgers',label:'🍔 Burgers'},{id:'sides',label:'🍟 Sides'},{id:'shakes',label:'🥤 Shakes'}],
+        menu:[
+          {id:1,cat:'burgers',name:'Classic Wagyu',desc:'Wagyu patty, American cheese, pickles, mustard',price:22,rating:'4.8',img:'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&q=80'},
+          {id:2,cat:'burgers',name:'BBQ Bacon Stack',desc:'Double patty, bacon, BBQ sauce, onion rings',price:26,rating:'4.7',img:'https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=200&q=80'},
+          {id:3,cat:'burgers',name:'Mushroom Swiss',desc:'Wagyu, Swiss cheese, sautéed mushrooms, aioli',price:24,rating:'4.6',img:'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=200&q=80'},
+          {id:4,cat:'sides',name:'Loaded Fries',desc:'Skin-on fries, cheese sauce, bacon, chives',price:12,rating:'4.7',img:'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=200&q=80'},
+          {id:5,cat:'shakes',name:'Salted Caramel Shake',desc:'Thick shake, salted caramel, whipped cream',price:10,rating:'4.8',img:'https://images.unsplash.com/photo-1568901839119-631418a3910d?w=200&q=80'},
+        ]},
     ],
   },
   US: {
-    name: 'United States', flag: '🇺🇸', currency: '$', currencyCode: 'USD',
-    taxLabel: 'Tax (8.5%)', taxRate: 0.085,
-    avgSpeedKmh: 35, searchRegion: 'United States',
-    searchPlaceholder: 'Search pizza, tacos, wings...',
-    bannerTitle: 'Zero-dollar food browsing',
-    bannerSub: 'The full DoorDash experience. Minus the $47 total. The food never arrives.',
-    riders: [
-      {name:'Tyler Johnson', vehicle:'Toyota Corolla', rating:'4.8', avatar:'🧑'},
-      {name:'Marcus Davis', vehicle:'Honda Civic', rating:'4.9', avatar:'👨'},
-      {name:'Jake Wilson', vehicle:'Ford Escape', rating:'4.7', avatar:'🧔'},
+    name:'United States', flag:'🇺🇸', currency:'$', taxLabel:'Tax (8.5%)', taxRate:0.085,
+    avgSpeed:35, searchRegion:'United States',
+    riders:[
+      {name:'Tyler Johnson',vehicle:'Toyota Corolla',rating:'4.8',av:'🧑'},
+      {name:'Marcus Davis',vehicle:'Honda Civic',rating:'4.9',av:'👨'},
     ],
-    payOptions: [
-      {icon:'💳', label:'Credit Card'}, {icon:'🍎', label:'Apple Pay'},
-      {icon:'🅿️', label:'PayPal'}, {icon:'📱', label:'Venmo'},
-    ],
-    restaurantName: 'Ghost Bites Kitchen',
-    categories: [
-      {id:'american', label:'🍔 American'},
-      {id:'pizza', label:'🍕 Pizza'},
-      {id:'tacos', label:'🌮 Tacos & Tex-Mex'},
-      {id:'sweets', label:'🍩 Sweets & Drinks'},
-    ],
-    menu: [
-      {id:1,cat:'american',emoji:'🍔',name:'Smash Burger (Double)',desc:'Two smashed patties, American cheese, pickles, onion, special sauce.',price:16,rating:'4.9',reviews:'21.3k'},
-      {id:2,cat:'american',emoji:'🍗',name:'Nashville Hot Chicken',desc:'Crispy fried chicken, cayenne paste, pickles, white bread. Fiery.',price:18,rating:'4.8',reviews:'14.2k'},
-      {id:3,cat:'american',emoji:'🌭',name:'BBQ Brisket Sandwich',desc:'12-hour smoked brisket, coleslaw, pickled onions, brioche.',price:19,rating:'4.7',reviews:'9.8k'},
-      {id:4,cat:'american',emoji:'🍟',name:'Loaded Cheese Fries',desc:'Waffle fries, house cheese sauce, bacon bits, jalapeños, ranch.',price:12,rating:'4.8',reviews:'18.6k'},
-      {id:5,cat:'pizza',emoji:'🍕',name:'New York Pepperoni',desc:'Thin crust, San Marzano sauce, fresh mozzarella, cupped pepperoni.',price:22,rating:'4.8',reviews:'16.4k'},
-      {id:6,cat:'pizza',emoji:'🍕',name:'Chicago Deep Dish',desc:'Thick buttery crust, chunky tomato, layers of cheese, Italian sausage.',price:28,rating:'4.7',reviews:'8.9k'},
-      {id:7,cat:'pizza',emoji:'🍕',name:'Buffalo Chicken Pizza',desc:'Spicy buffalo sauce, rotisserie chicken, blue cheese crumbles, celery.',price:24,rating:'4.6',reviews:'7.2k'},
-      {id:8,cat:'tacos',emoji:'🌮',name:'Birria Tacos (3)',desc:'Braised beef in adobo, melted Oaxacan cheese, consomme for dipping.',price:18,rating:'4.9',reviews:'24.7k'},
-      {id:9,cat:'tacos',emoji:'🌯',name:'Carne Asada Burrito',desc:'Grilled skirt steak, rice, black beans, pico, guac, sour cream.',price:16,rating:'4.7',reviews:'12.3k'},
-      {id:10,cat:'tacos',emoji:'🌮',name:'Fish Tacos (2)',desc:'Battered mahi-mahi, chipotle slaw, mango salsa, lime crema.',price:15,rating:'4.6',reviews:'8.4k'},
-      {id:11,cat:'sweets',emoji:'🍩',name:'Krispy Kreme Dozen',desc:'Original glazed, chocolate iced, strawberry sprinkles. Mixed.',price:18,rating:'4.9',reviews:'31.2k'},
-      {id:12,cat:'sweets',emoji:'🥤',name:'Boba Tea (Large)',desc:'Brown sugar milk tea with tapioca pearls. Perfectly sweet.',price:9,rating:'4.8',reviews:'19.4k'},
-      {id:13,cat:'sweets',emoji:'🍪',name:'Warm Cookie Skillet',desc:'Giant chocolate chip cookie, vanilla ice cream, hot fudge.',price:12,rating:'4.9',reviews:'14.8k'},
+    pay:[{icon:'💳',label:'Credit Card'},{icon:'🍎',label:'Apple Pay'},{icon:'🅿️',label:'PayPal'},{icon:'📱',label:'Venmo'}],
+    restaurants:[
+      {id:'burgers',name:'The Burger Joint',cuisine:'American Classics',rating:'4.9',dist:'1.1 km',emoji:'🍔',color:'#E74C3C',
+        cats:[{id:'burgers',label:'🍔 Burgers'},{id:'sides',label:'🍟 Sides'},{id:'drinks',label:'🥤 Drinks'}],
+        menu:[
+          {id:1,cat:'burgers',name:'Smash Burger (Double)',desc:'Two smashed patties, American cheese, pickles, sauce',price:16,rating:'4.9',img:'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&q=80'},
+          {id:2,cat:'burgers',name:'Nashville Hot Chicken',desc:'Crispy chicken, cayenne paste, pickles, white bread',price:18,rating:'4.8',img:'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=200&q=80'},
+          {id:3,cat:'burgers',name:'BBQ Brisket Sandwich',desc:'12-hour smoked brisket, coleslaw, pickled onions',price:19,rating:'4.7',img:'https://images.unsplash.com/photo-1555072956-7758afb20e8f?w=200&q=80'},
+          {id:4,cat:'sides',name:'Loaded Cheese Fries',desc:'Waffle fries, cheese sauce, bacon, jalapeños',price:12,rating:'4.8',img:'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=200&q=80'},
+          {id:5,cat:'drinks',name:'Boba Tea',desc:'Brown sugar milk tea, tapioca pearls, large',price:9,rating:'4.8',img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&q=80'},
+        ]},
+      {id:'tacos',name:'Taco Loco',cuisine:'Mexican & Tex-Mex',rating:'4.8',dist:'1.6 km',emoji:'🌮',color:'#27AE60',
+        cats:[{id:'tacos',label:'🌮 Tacos'},{id:'burritos',label:'🌯 Burritos'},{id:'sides',label:'🫔 Sides'}],
+        menu:[
+          {id:1,cat:'tacos',name:'Birria Tacos (3)',desc:'Braised beef, Oaxacan cheese, consomme for dipping',price:18,rating:'4.9',img:'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=200&q=80'},
+          {id:2,cat:'tacos',name:'Fish Tacos (2)',desc:'Battered mahi-mahi, chipotle slaw, lime crema',price:15,rating:'4.6',img:'https://images.unsplash.com/photo-1564767655658-4e36e9f6d2de?w=200&q=80'},
+          {id:3,cat:'burritos',name:'Carne Asada Burrito',desc:'Grilled steak, rice, beans, pico, guac, sour cream',price:16,rating:'4.7',img:'https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=200&q=80'},
+          {id:4,cat:'sides',name:'Chips & Guacamole',desc:'House-made tortilla chips, fresh guacamole',price:9,rating:'4.7',img:'https://images.unsplash.com/photo-1553909489-cd47e0907980?w=200&q=80'},
+        ]},
     ],
   },
   UK: {
-    name: 'United Kingdom', flag: '🇬🇧', currency: '£', currencyCode: 'GBP',
-    taxLabel: 'VAT (20%)', taxRate: 0.20,
-    avgSpeedKmh: 20, searchRegion: 'United Kingdom',
-    searchPlaceholder: 'Search curry, fish & chips, Sunday roast...',
-    bannerTitle: "Tonight's order",
-    bannerSub: 'All the takeaway feels. None of the £45 Deliveroo bill. The food never comes.',
-    riders: [
-      {name:'James Fletcher', vehicle:'Yamaha scooter', rating:'4.8', avatar:'🧑'},
-      {name:'Oliver Smith', vehicle:'Pedal cycle', rating:'4.7', avatar:'🚴'},
-      {name:'Harry Thompson', vehicle:'Electric moped', rating:'4.9', avatar:'👨'},
+    name:'United Kingdom', flag:'🇬🇧', currency:'£', taxLabel:'VAT (20%)', taxRate:0.20,
+    avgSpeed:20, searchRegion:'United Kingdom',
+    riders:[
+      {name:'James Fletcher',vehicle:'Yamaha scooter',rating:'4.8',av:'🧑'},
+      {name:'Oliver Smith',vehicle:'Pedal cycle',rating:'4.7',av:'🚴'},
     ],
-    payOptions: [
-      {icon:'💳', label:'Card'}, {icon:'📱', label:'Apple Pay'},
-      {icon:'🏦', label:'Bank Transfer'}, {icon:'💵', label:'Cash'},
-    ],
-    restaurantName: 'Phantom Chippy & Grill',
-    categories: [
-      {id:'british', label:'🐟 British Classics'},
-      {id:'curry', label:'🍛 Curry House'},
-      {id:'burgers', label:'🍔 Burgers & Sides'},
-      {id:'sweets', label:'🍮 Puds & Drinks'},
-    ],
-    menu: [
-      {id:1,cat:'british',emoji:'🐟',name:'Fish & Chips (Large)',desc:'Crispy battered cod, thick-cut chips, mushy peas, curry sauce.',price:13,rating:'4.9',reviews:'22.1k'},
-      {id:2,cat:'british',emoji:'🥘',name:'Sunday Roast',desc:'Roast beef, Yorkshire pudding, roasties, gravy, seasonal veg.',price:18,rating:'4.8',reviews:'14.6k'},
-      {id:3,cat:'british',emoji:'🥧',name:'Steak & Ale Pie',desc:'Shortcrust pastry, braised beef shin, Guinness gravy, peas.',price:15,rating:'4.7',reviews:'9.3k'},
-      {id:4,cat:'british',emoji:'🥓',name:'Full English Breakfast',desc:'Bacon, eggs, sausage, beans, black pudding, grilled tomato, toast.',price:12,rating:'4.9',reviews:'28.4k'},
-      {id:5,cat:'curry',emoji:'🍛',name:'Chicken Tikka Masala',desc:'Grilled chicken in creamy tomato-spiced sauce. The national dish.',price:14,rating:'4.9',reviews:'31.2k'},
-      {id:6,cat:'curry',emoji:'🍲',name:'Lamb Rogan Josh',desc:'Slow-cooked lamb, Kashmiri chillies, whole spices. With pilau.',price:16,rating:'4.7',reviews:'8.9k'},
-      {id:7,cat:'curry',emoji:'🫓',name:'Garlic Naan (2) + Onion Bhaji',desc:'Fluffy garlic naans with three crispy onion bhajis and mint chutney.',price:9,rating:'4.8',reviews:'12.7k'},
-      {id:8,cat:'burgers',emoji:'🍔',name:'Smash Burger (Double)',desc:'Dry-aged beef, mature cheddar, dill pickles, house burger sauce.',price:15,rating:'4.8',reviews:'16.3k'},
-      {id:9,cat:'burgers',emoji:'🍟',name:'Loaded Fries',desc:'Skin-on fries, pulled pork, crispy onions, sriracha mayo.',price:10,rating:'4.7',reviews:'11.4k'},
-      {id:10,cat:'burgers',emoji:'🌯',name:'Dirty Chicken Wrap',desc:'Crispy fried chicken thigh, slaw, pickled chillies, garlic mayo.',price:12,rating:'4.6',reviews:'8.2k'},
-      {id:11,cat:'sweets',emoji:'🍮',name:'Sticky Toffee Pudding',desc:'Warm date sponge, toffee sauce, clotted cream. Absolute classic.',price:8,rating:'4.9',reviews:'19.7k'},
-      {id:12,cat:'sweets',emoji:'☕',name:'Builder\'s Tea + Biscuits',desc:'Strong PG Tips, splash of milk, four digestive biscuits.',price:4,rating:'4.9',reviews:'44.2k'},
-      {id:13,cat:'sweets',emoji:'🍦',name:'Eton Mess',desc:'Crushed meringue, whipped cream, fresh strawberries, strawberry coulis.',price:9,rating:'4.7',reviews:'7.8k'},
+    pay:[{icon:'💳',label:'Card'},{icon:'📱',label:'Apple Pay'},{icon:'🏦',label:'Bank Transfer'},{icon:'💵',label:'Cash'}],
+    restaurants:[
+      {id:'chippy',name:'The Golden Chippy',cuisine:'British Classics',rating:'4.9',dist:'0.9 km',emoji:'🐟',color:'#2980B9',
+        cats:[{id:'mains',label:'🐟 Mains'},{id:'sides',label:'🍟 Sides'},{id:'puds',label:'🍮 Puds'}],
+        menu:[
+          {id:1,cat:'mains',name:'Fish & Chips (Large)',desc:'Crispy battered cod, thick-cut chips, mushy peas',price:13,rating:'4.9',img:'https://images.unsplash.com/photo-1580822184713-fc5400e7fe10?w=200&q=80'},
+          {id:2,cat:'mains',name:'Steak & Ale Pie',desc:'Braised beef shin, Guinness gravy, shortcrust pastry',price:15,rating:'4.7',img:'https://images.unsplash.com/photo-1588458977977-7cbcef5a2749?w=200&q=80'},
+          {id:3,cat:'mains',name:'Full English Breakfast',desc:'Bacon, eggs, sausage, beans, black pudding, toast',price:12,rating:'4.9',img:'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=200&q=80'},
+          {id:4,cat:'sides',name:'Mushy Peas & Gravy',desc:'Classic British side, proper gravy',price:4,rating:'4.6',img:'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&q=80'},
+          {id:5,cat:'puds',name:'Sticky Toffee Pudding',desc:'Warm date sponge, toffee sauce, clotted cream',price:8,rating:'4.9',img:'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=200&q=80'},
+          {id:6,cat:'puds',name:'Builder\'s Tea & Biscuits',desc:'Strong PG Tips, milk, four digestive biscuits',price:4,rating:'4.9',img:'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=200&q=80'},
+        ]},
+      {id:'curry',name:'Curry House',cuisine:'Indian & Balti',rating:'4.8',dist:'1.3 km',emoji:'🍛',color:'#F39C12',
+        cats:[{id:'mains',label:'🍛 Mains'},{id:'breads',label:'🫓 Breads'},{id:'drinks',label:'🥤 Drinks'}],
+        menu:[
+          {id:1,cat:'mains',name:'Chicken Tikka Masala',desc:'Grilled chicken, creamy tomato-spiced sauce, rice',price:14,rating:'4.9',img:'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=200&q=80'},
+          {id:2,cat:'mains',name:'Lamb Rogan Josh',desc:'Slow-cooked lamb, Kashmiri chillies, pilau rice',price:16,rating:'4.7',img:'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=200&q=80'},
+          {id:3,cat:'breads',name:'Garlic Naan (2)',desc:'Fluffy garlic naans, straight from the tandoor',price:5,rating:'4.8',img:'https://images.unsplash.com/photo-1586816001966-79b736744398?w=200&q=80'},
+        ]},
     ],
   },
   SG: {
-    name: 'Singapore', flag: '🇸🇬', currency: 'S$', currencyCode: 'SGD',
-    taxLabel: 'GST (9%)', taxRate: 0.09,
-    avgSpeedKmh: 25, searchRegion: 'Singapore',
-    searchPlaceholder: 'Search chicken rice, laksa, char kway teow...',
-    bannerTitle: 'Jiak liao, shiok or not?',
-    bannerSub: 'Browse all the hawker faves. Nothing arrives. Wallet safe, lah.',
-    riders: [
-      {name:'Wei Liang', vehicle:'Yamaha scooter', rating:'4.9', avatar:'🧑'},
-      {name:'Raj Kumar', vehicle:'Grab e-bike', rating:'4.8', avatar:'👨'},
-      {name:'Ahmad Faris', vehicle:'Honda Click', rating:'4.7', avatar:'🧔'},
+    name:'Singapore', flag:'🇸🇬', currency:'S$', taxLabel:'GST (9%)', taxRate:0.09,
+    avgSpeed:25, searchRegion:'Singapore',
+    riders:[
+      {name:'Wei Liang',vehicle:'Yamaha scooter',rating:'4.9',av:'🧑'},
+      {name:'Raj Kumar',vehicle:'Grab e-bike',rating:'4.8',av:'👨'},
     ],
-    payOptions: [
-      {icon:'📱', label:'PayNow'}, {icon:'🪙', label:'GrabPay'},
-      {icon:'💳', label:'Card'}, {icon:'💵', label:'Cash'},
-    ],
-    restaurantName: 'Phantom Hawker Centre',
-    categories: [
-      {id:'rice', label:'🍚 Rice & Noodles'},
-      {id:'hawker', label:'🍢 Hawker Faves'},
-      {id:'dessert', label:'🧊 Ice & Desserts'},
-      {id:'drinks', label:'🥤 Drinks & Kopi'},
-    ],
-    menu: [
-      {id:1,cat:'rice',emoji:'🍗',name:'Hainanese Chicken Rice',desc:'Poached chicken, fragrant rice, chilli sauce, dark soy, ginger.',price:6,rating:'4.9',reviews:'42.1k'},
-      {id:2,cat:'rice',emoji:'🍜',name:'Laksa',desc:'Spicy coconut curry broth, thick rice noodles, prawns, cockles.',price:8,rating:'4.9',reviews:'38.6k'},
-      {id:3,cat:'rice',emoji:'🍳',name:'Char Kway Teow',desc:'Wok-fried flat noodles, egg, bean sprouts, lup cheong, cockles.',price:7,rating:'4.8',reviews:'29.3k'},
-      {id:4,cat:'rice',emoji:'🍝',name:'Bak Chor Mee',desc:'Minced pork noodles, mushrooms, liver, vinegar, chilli.',price:6,rating:'4.7',reviews:'18.4k'},
-      {id:5,cat:'hawker',emoji:'🍢',name:'Satay (10 sticks)',desc:'Grilled chicken and beef skewers, peanut sauce, ketupat, onion.',price:12,rating:'4.9',reviews:'24.7k'},
-      {id:6,cat:'hawker',emoji:'🦀',name:'Chilli Crab (Half)',desc:'Sri Lankan crab in spicy tomato-chilli gravy. With mantou buns.',price:48,rating:'4.9',reviews:'16.2k'},
-      {id:7,cat:'hawker',emoji:'🍤',name:'Prawn Toast (6 pcs)',desc:'Sesame prawn paste on white bread, deep fried golden. Shiok.',price:9,rating:'4.7',reviews:'11.3k'},
-      {id:8,cat:'hawker',emoji:'🥚',name:'Roti Prata (2 pcs)',desc:'Crispy layered flatbread with egg, served with fish curry dip.',price:5,rating:'4.8',reviews:'31.8k'},
-      {id:9,cat:'dessert',emoji:'🧊',name:'Ice Kachang',desc:'Shaved ice, red beans, attap chee, corn, rose syrup, coconut milk.',price:5,rating:'4.8',reviews:'27.4k'},
-      {id:10,cat:'dessert',emoji:'🥞',name:'Mango Pomelo Sago',desc:'Chilled mango puree, pomelo pulp, sago pearls. Refreshing.',price:6,rating:'4.7',reviews:'19.6k'},
-      {id:11,cat:'dessert',emoji:'🍡',name:'Ondeh Ondeh (6 pcs)',desc:'Pandan glutinous rice balls, palm sugar, grated coconut.',price:4,rating:'4.9',reviews:'14.2k'},
-      {id:12,cat:'drinks',emoji:'☕',name:'Kopi O Kosong + Kaya Toast',desc:'Black coffee, two-minute egg, kaya butter toast. Singaporean breakfast.',price:5,rating:'4.9',reviews:'52.3k'},
-      {id:13,cat:'drinks',emoji:'🥤',name:'Teh Tarik (Large)',desc:'Pulled milk tea, frothy, perfectly sweet. Hawker classic.',price:3,rating:'4.9',reviews:'41.7k'},
+    pay:[{icon:'📱',label:'PayNow'},{icon:'🪙',label:'GrabPay'},{icon:'💳',label:'Card'},{icon:'💵',label:'Cash'}],
+    restaurants:[
+      {id:'hawker',name:'Maxwell Hawker',cuisine:'Hawker & Local',rating:'4.9',dist:'0.7 km',emoji:'🍜',color:'#E74C3C',
+        cats:[{id:'rice',label:'🍚 Rice & Noodles'},{id:'hawker',label:'🍢 Hawker Faves'},{id:'drinks',label:'🥤 Drinks'}],
+        menu:[
+          {id:1,cat:'rice',name:'Hainanese Chicken Rice',desc:'Poached chicken, fragrant rice, chilli, ginger',price:6,rating:'4.9',img:'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=200&q=80'},
+          {id:2,cat:'rice',name:'Laksa',desc:'Spicy coconut broth, rice noodles, prawns, cockles',price:8,rating:'4.9',img:'https://images.unsplash.com/photo-1548943487-a2e4e43b4853?w=200&q=80'},
+          {id:3,cat:'rice',name:'Char Kway Teow',desc:'Wok-fried flat noodles, egg, bean sprouts, cockles',price:7,rating:'4.8',img:'https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=200&q=80'},
+          {id:4,cat:'hawker',name:'Satay (10 sticks)',desc:'Grilled chicken & beef, peanut sauce, ketupat',price:12,rating:'4.9',img:'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=200&q=80'},
+          {id:5,cat:'drinks',name:'Kopi O + Kaya Toast',desc:'Black coffee, two-minute egg, kaya butter toast',price:5,rating:'4.9',img:'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&q=80'},
+        ]},
     ],
   },
   AE: {
-    name: 'UAE', flag: '🇦🇪', currency: 'AED', currencyCode: 'AED',
-    taxLabel: 'VAT (5%)', taxRate: 0.05,
-    avgSpeedKmh: 40, searchRegion: 'United Arab Emirates',
-    searchPlaceholder: 'Search shawarma, mandi, kunafa...',
-    bannerTitle: 'Zero-spend food browsing',
-    bannerSub: 'All the Talabat feels. AED 0 spent. The food never arrives, habibi.',
-    riders: [
-      {name:'Mohammed Al Rashid', vehicle:'Toyota Yaris', rating:'4.9', avatar:'🧑'},
-      {name:'Ahmed Hassan', vehicle:'Nissan Sunny', rating:'4.8', avatar:'👨'},
-      {name:'Bilal Chaudhry', vehicle:'Suzuki Alto', rating:'4.7', avatar:'🧔'},
+    name:'UAE', flag:'🇦🇪', currency:'AED', taxLabel:'VAT (5%)', taxRate:0.05,
+    avgSpeed:40, searchRegion:'United Arab Emirates',
+    riders:[
+      {name:'Mohammed Al Rashid',vehicle:'Toyota Yaris',rating:'4.9',av:'🧑'},
+      {name:'Ahmed Hassan',vehicle:'Nissan Sunny',rating:'4.8',av:'👨'},
     ],
-    payOptions: [
-      {icon:'💳', label:'Card'}, {icon:'📱', label:'Apple Pay'},
-      {icon:'💵', label:'Cash'}, {icon:'🏦', label:'Bank Transfer'},
+    pay:[{icon:'💳',label:'Card'},{icon:'📱',label:'Apple Pay'},{icon:'💵',label:'Cash'},{icon:'🏦',label:'Bank Transfer'}],
+    restaurants:[
+      {id:'arabic',name:'Al Baik Express',cuisine:'Arabic & Levantine',rating:'4.9',dist:'1.2 km',emoji:'🥙',color:'#27AE60',
+        cats:[{id:'mains',label:'🥙 Mains'},{id:'grills',label:'🍖 Grills'},{id:'sweets',label:'🍯 Sweets'}],
+        menu:[
+          {id:1,cat:'mains',name:'Chicken Shawarma',desc:'Spit-roasted chicken, garlic sauce, pickles, fries',price:22,rating:'4.9',img:'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=200&q=80'},
+          {id:2,cat:'mains',name:'Hummus with Meat',desc:'Creamy hummus, spiced lamb, pine nuts, parsley',price:35,rating:'4.8',img:'https://images.unsplash.com/photo-1585325701956-60dd9c8553bc?w=200&q=80'},
+          {id:3,cat:'grills',name:'Mixed Grill Platter',desc:'Shish tawook, kafta, lamb chops, rice, bread',price:89,rating:'4.9',img:'https://images.unsplash.com/photo-1544025162-d76694265947?w=200&q=80'},
+          {id:4,cat:'sweets',name:'Kunafa',desc:'Shredded pastry, Akkawi cheese, rose syrup, pistachios',price:35,rating:'4.9',img:'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=200&q=80'},
+          {id:5,cat:'sweets',name:'Karak Chai',desc:'Strong spiced tea with evaporated milk',price:8,rating:'4.9',img:'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=200&q=80'},
+        ]},
     ],
-    restaurantName: 'Phantom Mandi House',
-    categories: [
-      {id:'arabic', label:'🥙 Arabic & Levantine'},
-      {id:'mandi', label:'🍖 Mandi & Grills'},
-      {id:'snacks', label:'🧆 Snacks & Street'},
-      {id:'sweets', label:'🍯 Sweets & Drinks'},
+  },
+  JP: {
+    name:'Japan', flag:'🇯🇵', currency:'¥', taxLabel:'消費税 (10%)', taxRate:0.10,
+    avgSpeed:22, searchRegion:'Japan',
+    riders:[
+      {name:'Kenji Tanaka',vehicle:'Honda Cub',rating:'4.9',av:'🧑'},
+      {name:'Hiroshi Yamamoto',vehicle:'Yamaha Gear',rating:'4.8',av:'👨'},
     ],
-    menu: [
-      {id:1,cat:'arabic',emoji:'🥙',name:'Chicken Shawarma',desc:'Spit-roasted chicken, garlic sauce, pickles, fries in wrap.',price:22,rating:'4.9',reviews:'38.4k'},
-      {id:2,cat:'arabic',emoji:'🫕',name:'Hummus with Meat',desc:'Creamy hummus topped with spiced minced lamb, pine nuts, parsley.',price:35,rating:'4.8',reviews:'14.2k'},
-      {id:3,cat:'arabic',emoji:'🍛',name:'Mixed Grill Platter',desc:'Shish tawook, kafta, lamb chops, grilled veggies, rice, bread.',price:89,rating:'4.9',reviews:'22.7k'},
-      {id:4,cat:'arabic',emoji:'🥗',name:'Fattoush + Tabouleh Combo',desc:'Fresh fattoush salad with crispy bread and herb-heavy tabouleh.',price:28,rating:'4.6',reviews:'9.1k'},
-      {id:5,cat:'mandi',emoji:'🍖',name:'Lamb Mandi (Half)',desc:'Slow-cooked lamb over fragrant rice in tandoor. With salad and sauce.',price:120,rating:'4.9',reviews:'19.8k'},
-      {id:6,cat:'mandi',emoji:'🍗',name:'Chicken Mandi',desc:'Whole slow-cooked chicken, spiced Yemeni rice, tomato sauce.',price:75,rating:'4.8',reviews:'16.3k'},
-      {id:7,cat:'mandi',emoji:'🐟',name:'Grilled Hammour',desc:'Fresh hammour fillet, garlic butter, lemon, served with saffron rice.',price:95,rating:'4.7',reviews:'8.4k'},
-      {id:8,cat:'snacks',emoji:'🧆',name:'Falafel Wrap + Fries',desc:'Crispy falafel, tahini, tomato, lettuce, pickles in flatbread.',price:18,rating:'4.8',reviews:'21.4k'},
-      {id:9,cat:'snacks',emoji:'🥚',name:'Shakshuka',desc:'Eggs poached in spiced tomato and pepper sauce. With pita bread.',price:32,rating:'4.7',reviews:'12.6k'},
-      {id:10,cat:'snacks',emoji:'🫓',name:'Manakeesh Zaatar (2)',desc:'Flatbread with wild thyme, sesame, olive oil. Fresh from oven.',price:15,rating:'4.8',reviews:'17.3k'},
-      {id:11,cat:'sweets',emoji:'🍯',name:'Kunafa (Large)',desc:'Shredded pastry, Akkawi cheese, rose water syrup, pistachios.',price:35,rating:'4.9',reviews:'28.6k'},
-      {id:12,cat:'sweets',emoji:'☕',name:'Karak Chai',desc:'Strong spiced tea brewed with evaporated milk. Thick and sweet.',price:8,rating:'4.9',reviews:'44.1k'},
-      {id:13,cat:'sweets',emoji:'🍮',name:'Om Ali',desc:'Egyptian bread pudding with cream, nuts, raisins. Served warm.',price:28,rating:'4.8',reviews:'11.2k'},
+    pay:[{icon:'📱',label:'PayPay'},{icon:'💳',label:'Card'},{icon:'💴',label:'Cash'},{icon:'🔵',label:'Suica'}],
+    restaurants:[
+      {id:'ramen',name:'麺屋 一風堂',cuisine:'Ramen & Noodles',rating:'4.9',dist:'0.9 km',emoji:'🍜',color:'#C0392B',
+        cats:[{id:'ramen',label:'🍜 ラーメン'},{id:'sides',label:'🥟 サイド'},{id:'drinks',label:'🍺 ドリンク'}],
+        menu:[
+          {id:1,cat:'ramen',name:'濃厚豚骨ラーメン',desc:'12時間炊いた豚骨スープ、チャーシュー、煮卵、海苔',price:980,rating:'4.9',img:'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=200&q=80'},
+          {id:2,cat:'ramen',name:'醤油ラーメン',desc:'鶏ガラ醤油ベース、鳴門巻き、メンマ、チャーシュー',price:850,rating:'4.7',img:'https://images.unsplash.com/photo-1591814468924-caf88d1232e1?w=200&q=80'},
+          {id:3,cat:'ramen',name:'担々麺',desc:'四川風ピリ辛ごまスープ、挽き肉、青梗菜',price:990,rating:'4.8',img:'https://images.unsplash.com/photo-1555126634-323283e090fa?w=200&q=80'},
+          {id:4,cat:'sides',name:'餃子 (6個)',desc:'手作り焼き餃子、タレ付き',price:480,rating:'4.8',img:'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=200&q=80'},
+          {id:5,cat:'drinks',name:'生ビール',desc:'キンキンに冷えた生ビール',price:550,rating:'4.7',img:'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=200&q=80'},
+        ]},
+      {id:'sushi',name:'魚べい 寿司',cuisine:'Sushi & Seafood',rating:'4.8',dist:'1.5 km',emoji:'🍣',color:'#2980B9',
+        cats:[{id:'sushi',label:'🍣 寿司'},{id:'donburi',label:'🍱 丼'},{id:'sweets',label:'🍡 デザート'}],
+        menu:[
+          {id:1,cat:'sushi',name:'特上握り 10貫',desc:'大トロ、中トロ、ウニ、イクラ、ホタテなど旬のネタ',price:3200,rating:'4.9',img:'https://images.unsplash.com/photo-1553621042-f6e147245754?w=200&q=80'},
+          {id:2,cat:'sushi',name:'サーモン盛り合わせ',desc:'サーモン握り、炙り、アボカド巻き',price:1400,rating:'4.7',img:'https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=200&q=80'},
+          {id:3,cat:'donburi',name:'海鮮丼',desc:'マグロ、サーモン、イクラ、ウニの豪華丼',price:1800,rating:'4.8',img:'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=200&q=80'},
+          {id:4,cat:'sweets',name:'抹茶パフェ',desc:'抹茶アイス、白玉、小豆、ほうじ茶ゼリー',price:680,rating:'4.9',img:'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=200&q=80'},
+        ]},
     ],
   },
 };
 
-// ─── STATE ─────────────────────────────────────────────────
-let selectedCountry = 'IN'; // default, auto-updated from GPS
-let userLocation = null;
-let restaurantLocation = null;
-let routeCoords = null;
-let etaMinutes = 30;
-let distanceKm = 2.5;
-let cart = {};
-let currentCat = 'all';
+// ── STATE ─────────────────────────────────────────────────
+let country = null, userLoc = null, restLoc = null, routeCoords = null;
+let etaMins = 30, distKm = 2.5;
+let cart = {}, currentCat = 'all', selectedRest = null;
 let map, riderMarker, trackingInterval;
 let streak = parseInt(localStorage.getItem('na_streak') || '0');
 let searchTimeout = null;
+const GEOAPIFY_KEY = '921ca322bae048cfba5f12f2f06e9b6a';
 
-// ─── COUNTRY SELECTION ──────────────────────────────────────
+// ── COUNTRY ───────────────────────────────────────────────
 function selectCountry(code, el) {
-  selectedCountry = code;
+  country = code;
   document.querySelectorAll('.country-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
-  document.getElementById('continue-btn').classList.add('ready');
-  // Auto-proceed after short delay for snappiness
-  // (user can still tap button instead)
+  document.getElementById('country-cta').classList.add('ready');
 }
 
 function goToLocation() {
-  if (!selectedCountry) return;
-  const c = COUNTRIES[selectedCountry];
+  if (!country) return;
+  const c = COUNTRIES[country];
   document.getElementById('loc-flag').textContent = c.flag;
+  document.getElementById('loc-sub').textContent = 'Searching in ' + c.name + '. Delivery time is calculated from your exact location.';
   document.getElementById('loc-input').placeholder = 'Search in ' + c.name + '...';
-  document.getElementById('loc-sub').textContent = 'Searching in ' + c.name + '. We calculate a realistic estimated delivery time based on your real location.';
   showScreen('location');
 }
 
-// ─── LOCATION ──────────────────────────────────────────────
+// ── LOCATION ──────────────────────────────────────────────
 function detectLocation() {
   const el = document.getElementById('loc-detecting');
   el.style.display = 'flex';
   if (!navigator.geolocation) { alert('Geolocation not supported.'); el.style.display='none'; return; }
-  navigator.geolocation.getCurrentPosition(
-    async pos => {
-      const {latitude:lat, longitude:lng} = pos.coords;
-      // Auto-detect country from coordinates
-      const detectedCountry = detectCountryFromCoords(lat, lng);
-      if (!selectedCountry) {
-        selectedCountry = detectedCountry;
-      }
-      const name = await reverseGeocode(lat, lng);
-      el.style.display = 'none';
-      await setUserLocation(lat, lng, name);
-    },
-    () => { el.style.display='none'; alert('Could not get location. Please search manually.'); },
-    {timeout: 8000}
-  );
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const {latitude:lat, longitude:lng} = pos.coords;
+    const name = await reverseGeocode(lat, lng);
+    el.style.display = 'none';
+    await setUserLocation(lat, lng, name);
+  }, () => { el.style.display='none'; alert('Could not get location. Please search manually.'); }, {timeout:8000});
 }
 
 async function reverseGeocode(lat, lng) {
@@ -794,137 +755,121 @@ async function reverseGeocode(lat, lng) {
   return 'Your location';
 }
 
-// ── Geoapify Search ────────────────────────────────────────
-// API key is server-side only
-
 function searchLocation(query) {
   clearTimeout(searchTimeout);
   const box = document.getElementById('loc-suggestions');
   if (query.length < 2) { box.style.display='none'; return; }
   box.innerHTML = '<div style="padding:12px 16px;font-size:13px;color:var(--muted);">Searching...</div>';
   box.style.display = 'block';
-
-  const countryFilter = {IN:'in',AU:'au',US:'us',UK:'gb',SG:'sg',AE:'ae',JP:'jp'}[selectedCountry] || '';
-
+  const cc = {IN:'in',AU:'au',US:'us',UK:'gb',SG:'sg',AE:'ae',JP:'jp'}[country] || 'in';
   searchTimeout = setTimeout(async () => {
     try {
-      const url = `/api/search?q=${encodeURIComponent(query)}&country=${countryFilter}`;
-      const res = await fetch(url);
+      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}&country=${cc}`);
       const data = await res.json();
       const features = data.features || [];
-
-      if (!features.length) {
-        box.innerHTML = '<div style="padding:14px 16px;font-size:13px;color:var(--muted);">No results found. Try GPS above or a nearby landmark.</div>';
-        return;
-      }
-
+      if (!features.length) { box.innerHTML='<div style="padding:14px 16px;font-size:13px;color:var(--muted);">No results. Try GPS above.</div>'; return; }
       box.innerHTML = features.map(f => {
         const p = f.properties;
         const main = p.name || p.street || p.suburb || p.city || p.formatted?.split(',')[0] || '';
-        const parts = [p.suburb || p.district, p.city || p.town, p.state, p.country].filter(Boolean);
-        // Remove duplicate of main from parts
-        const sub = parts.filter(x => x !== main).slice(0,3).join(', ');
-        const lat = f.geometry.coordinates[1];
-        const lng = f.geometry.coordinates[0];
-        return `<div class="loc-suggestion" onclick="selectGeoapify(${lat}, ${lng}, '${main.replace(/'/g,"\'").replace(/"/g,"&quot;")}', '${sub.replace(/'/g,"\'").replace(/"/g,"&quot;")}')">
-          <svg class="loc-suggestion-pin" width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
-          <div>
-            <div class="loc-suggestion-main">${main}</div>
-            <div class="loc-suggestion-sub">${sub}</div>
-          </div>
+        const sub = [p.suburb||p.district, p.city||p.town, p.state].filter(Boolean).filter(x=>x!==main).slice(0,2).join(', ');
+        const lat = f.geometry.coordinates[1], lng = f.geometry.coordinates[0];
+        return `<div class="suggestion" onclick="selectSug(${lat},${lng},'${main.replace(/'/g,"\\'")}')">
+          <svg class="sug-pin" width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+          <div><div class="sug-main">${main}</div><div class="sug-sub">${sub}</div></div>
         </div>`;
       }).join('');
       box.style.display = 'block';
-
-    } catch(e) {
-      console.error('Search error:', e);
-      box.innerHTML = '<div style="padding:14px 16px;font-size:13px;color:var(--muted);">Search failed. Please use GPS above.</div>';
-    }
+    } catch(e) { box.innerHTML='<div style="padding:14px 16px;font-size:13px;color:var(--muted);">Search failed. Use GPS above.</div>'; }
   }, 350);
 }
 
-async function selectGeoapify(lat, lng, name, sub) {
+async function selectSug(lat, lng, name) {
   document.getElementById('loc-suggestions').style.display = 'none';
-  document.getElementById('loc-input').value = name + (sub ? ', ' + sub : '');
+  document.getElementById('loc-input').value = name;
   await setUserLocation(lat, lng, name);
 }
 
-// Auto-detect country from GPS coords
-function detectCountryFromCoords(lat, lng) {
-  // Simple bounding box detection
-  if (lat >= 6 && lat <= 37 && lng >= 68 && lng <= 97) return 'IN';   // India
-  if (lat >= -44 && lat <= -10 && lng >= 113 && lng <= 154) return 'AU'; // Australia
-  if (lat >= 24 && lat <= 50 && lng >= -125 && lng <= -66) return 'US'; // USA
-  if (lat >= 49 && lat <= 61 && lng >= -8 && lng <= 2) return 'UK';    // UK
-  if (lat >= 1.1 && lat <= 1.5 && lng >= 103 && lng <= 104) return 'SG'; // Singapore
-  if (lat >= 22 && lat <= 26 && lng >= 51 && lng <= 56) return 'AE';   // UAE
-  if (lat >= 24 && lat <= 46 && lng >= 122 && lng <= 146) return 'JP';  // Japan
-  return 'IN'; // default
-}
-
 async function setUserLocation(lat, lng, name) {
-  userLocation = { lat, lng, name };
-  // Use the country the user picked — don't override it
-  const c = COUNTRIES[selectedCountry] || COUNTRIES['IN'];
-
-  // Place restaurant 1.5–3km away
+  userLoc = {lat, lng, name};
+  const c = COUNTRIES[country];
   const angle = Math.random() * 2 * Math.PI;
   const dist = (1.5 + Math.random() * 1.5) / 111;
-  restaurantLocation = { lat: lat + dist * Math.cos(angle), lng: lng + dist * Math.sin(angle) };
-
-  // Get REAL road route from OSRM
+  restLoc = {lat: lat + dist * Math.cos(angle), lng: lng + dist * Math.sin(angle)};
   routeCoords = null;
   try {
-    const url = `https://router.project-osrm.org/route/v1/driving/${restaurantLocation.lng},${restaurantLocation.lat};${lng},${lat}?overview=full&geometries=geojson&steps=false`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data.routes && data.routes[0]) {
-      const route = data.routes[0];
-      routeCoords = route.geometry.coordinates.map(c => [c[1], c[0]]);
-      distanceKm = route.distance / 1000;
-      const roadMins = route.duration / 60;
-      etaMinutes = Math.round(roadMins * getTrafficMultiplier()) + 8;
-      etaMinutes = Math.max(15, Math.min(75, etaMinutes));
+    const url = `https://router.project-osrm.org/route/v1/driving/${restLoc.lng},${restLoc.lat};${lng},${lat}?overview=full&geometries=geojson`;
+    const r = await fetch(url);
+    const data = await r.json();
+    if (data.routes?.[0]) {
+      routeCoords = data.routes[0].geometry.coordinates.map(c => [c[1],c[0]]);
+      distKm = data.routes[0].distance / 1000;
+      const roadMins = data.routes[0].duration / 60;
+      etaMins = Math.round(roadMins * getTrafficMult()) + 8;
+      etaMins = Math.max(15, Math.min(75, etaMins));
     }
   } catch(e) {
-    distanceKm = haversine(lat, lng, restaurantLocation.lat, restaurantLocation.lng);
-    etaMinutes = Math.round((distanceKm / c.avgSpeedKmh) * 60 * getTrafficMultiplier()) + 8;
-    etaMinutes = Math.max(15, Math.min(75, etaMinutes));
+    distKm = haversine(lat, lng, restLoc.lat, restLoc.lng);
+    etaMins = Math.round((distKm / c.avgSpeed) * 60 * getTrafficMult()) + 8;
+    etaMins = Math.max(15, Math.min(75, etaMins));
   }
-
-  buildHomeScreen();
+  buildHome();
   showScreen('home');
 }
 
-function buildHomeScreen() {
-  const c = COUNTRIES[selectedCountry];
-  const shortName = userLocation.name.length > 18 ? userLocation.name.substring(0,18) + '…' : userLocation.name;
-  document.getElementById('header-loc-name').textContent = shortName;
-  document.getElementById('eta-strip-loc').textContent = shortName;
-  document.getElementById('eta-strip-time').textContent = etaMinutes + '–' + (etaMinutes + 5) + ' min';
-  document.getElementById('search-placeholder').textContent = c.searchPlaceholder;
-  document.getElementById('banner-title').textContent = c.bannerTitle;
-  document.getElementById('banner-sub').textContent = c.bannerSub;
-  document.getElementById('cart-eta-text').textContent = etaMinutes + '–' + (etaMinutes + 5) + ' min';
-  document.getElementById('checkout-eta').textContent = etaMinutes + '–' + (etaMinutes + 5) + ' min';
-  document.getElementById('checkout-address').textContent = userLocation.name;
-  document.getElementById('cart-restaurant-name').innerHTML = c.restaurantName + ' · <span id="cart-eta-text">' + etaMinutes + '–' + (etaMinutes + 5) + ' min</span>';
-
-  // Pay options
-  document.getElementById('pay-options').innerHTML = c.payOptions.map((p,i) =>
+// ── HOME ──────────────────────────────────────────────────
+function buildHome() {
+  const c = COUNTRIES[country];
+  const short = userLoc.name.length > 18 ? userLoc.name.slice(0,18) + '…' : userLoc.name;
+  document.getElementById('header-loc-name').textContent = short;
+  document.getElementById('eta-loc').textContent = short;
+  document.getElementById('eta-time-strip').textContent = etaMins + '–' + (etaMins+5) + ' min';
+  document.getElementById('search-ph').textContent = 'Search restaurants or dishes...';
+  document.getElementById('checkout-addr').textContent = userLoc.name;
+  document.getElementById('co-eta').textContent = etaMins + '–' + (etaMins+5) + ' min';
+  document.getElementById('pay-grid').innerHTML = c.pay.map((p,i) =>
     `<div class="pay-opt ${i===0?'selected':''}" onclick="selectPay(this)"><div class="pay-opt-icon">${p.icon}</div><div class="pay-opt-label">${p.label}</div></div>`
   ).join('');
 
-  // Categories
+  // Restaurants
+  document.getElementById('restaurant-scroll').innerHTML = c.restaurants.map(r =>
+    `<div class="rest-card ${selectedRest?.id===r.id?'selected':''}" onclick="selectRest('${r.id}')">
+      <div class="rest-img-placeholder" style="background:${r.color}22">${r.emoji}</div>
+      <div class="rest-info">
+        <div class="rest-name">${r.name}</div>
+        <div class="rest-cuisine">${r.cuisine}</div>
+        <div class="rest-meta">
+          <div class="rest-rating">★ ${r.rating}</div>
+          <div class="rest-dist">${r.dist}</div>
+        </div>
+      </div>
+    </div>`
+  ).join('');
+
+  // Auto-select first restaurant
+  if (!selectedRest) selectRestById(c.restaurants[0].id);
+}
+
+function selectRest(id) {
+  cart = {};
+  updateCartBar();
+  selectRestById(id);
+}
+
+function selectRestById(id) {
+  const c = COUNTRIES[country];
+  selectedRest = c.restaurants.find(r => r.id === id);
+  if (!selectedRest) return;
+  document.querySelectorAll('.rest-card').forEach((el,i) => {
+    el.classList.toggle('selected', c.restaurants[i].id === id);
+  });
+  document.getElementById('cart-rest-name').innerHTML = selectedRest.name + ' · <span id="cart-eta-txt">' + etaMins + '–' + (etaMins+5) + ' min</span>';
+  currentCat = 'all';
   document.getElementById('cat-scroll').innerHTML =
     `<div class="cat-pill active" onclick="filterCat('all',this)">All</div>` +
-    c.categories.map(cat => `<div class="cat-pill" onclick="filterCat('${cat.id}',this)">${cat.label}</div>`).join('');
-
-  currentCat = 'all';
+    selectedRest.cats.map(cat => `<div class="cat-pill" onclick="filterCat('${cat.id}',this)">${cat.label}</div>`).join('');
   renderItems();
 }
 
-// ─── MENU ──────────────────────────────────────────────────
 function filterCat(cat, el) {
   currentCat = cat;
   document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
@@ -933,74 +878,71 @@ function filterCat(cat, el) {
 }
 
 function renderItems() {
-  const c = COUNTRIES[selectedCountry];
-  const filtered = currentCat === 'all' ? c.menu : c.menu.filter(i => i.cat === currentCat);
-  document.getElementById('items-list').innerHTML =
-    `<div class="section-title">${currentCat === 'all' ? 'All items' : c.categories.find(x=>x.id===currentCat)?.label.replace(/^.\s/,'') || 'Items'}</div>` +
-    filtered.map(item => `
-      <div class="item-card">
-        <div class="item-inner">
-          <div class="item-img">${item.emoji}</div>
-          <div class="item-details">
-            <div class="item-name">${item.name}</div>
-            <div class="item-desc">${item.desc}</div>
-            <div class="item-meta">
-              <div>
-                <div class="item-price">${c.currency}${item.price}</div>
-                <div class="item-rating">★ ${item.rating} (${item.reviews})</div>
-              </div>
-              <button class="add-btn ${cart[item.id]?'added':''}" onclick="addToCart(${item.id})">
-                ${cart[item.id] ? '✓ '+cart[item.id]+' added' : '+ Add'}
-              </button>
+  const c = COUNTRIES[country];
+  const filtered = currentCat === 'all' ? selectedRest.menu : selectedRest.menu.filter(i => i.cat === currentCat);
+  document.getElementById('items-list').innerHTML = filtered.map(item => `
+    <div class="item-card">
+      <div class="item-inner">
+        <div class="item-img-wrap">
+          <img class="item-img" src="${item.img}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" loading="lazy">
+          <div class="item-img-placeholder" style="display:none">🍽️</div>
+        </div>
+        <div class="item-details">
+          <div class="item-name">${item.name}</div>
+          <div class="item-desc">${item.desc}</div>
+          <div class="item-bottom">
+            <div>
+              <div class="item-price">${c.currency}${item.price}</div>
+              <div class="item-rating">★ ${item.rating}</div>
             </div>
+            <button class="add-btn ${cart[item.id]?'added':''}" onclick="addToCart(${item.id})">
+              ${cart[item.id] ? '✓ '+cart[item.id] : '+ Add'}
+            </button>
           </div>
         </div>
-      </div>`).join('');
+      </div>
+    </div>`).join('');
 }
 
 function addToCart(id) {
-  cart[id] = (cart[id] || 0) + 1;
+  cart[id] = (cart[id]||0) + 1;
   updateCartBar();
   renderItems();
 }
 
 function updateCartBar() {
-  const c = COUNTRIES[selectedCountry];
+  const c = COUNTRIES[country];
   const count = Object.values(cart).reduce((s,v)=>s+v,0);
   document.getElementById('cart-count').textContent = count;
-  document.getElementById('cart-price').textContent = c.currency + getTotal();
+  document.getElementById('cart-price').textContent = c.currency + getTotal().toFixed(2);
   document.getElementById('cart-bar').classList.toggle('hidden', count === 0);
 }
 
-function fmt(n) {
-  const c = COUNTRIES[selectedCountry];
-  return c.currency + (Number.isInteger(n) ? n : n.toFixed(2));
-}
-function getSubtotal() {
-  const c = COUNTRIES[selectedCountry];
-  return c.menu.reduce((s,item) => s + (cart[item.id]||0) * item.price, 0);
+function getSub() {
+  return selectedRest.menu.reduce((s,item) => s + (cart[item.id]||0) * item.price, 0);
 }
 function getTotal() {
-  const c = COUNTRIES[selectedCountry];
-  const sub = getSubtotal();
-  return +(sub + sub * c.taxRate).toFixed(2);
+  const c = COUNTRIES[country];
+  const sub = getSub();
+  return sub + sub * c.taxRate;
 }
+function fmt(n) { return COUNTRIES[country].currency + (Number.isInteger(n) ? n : n.toFixed(2)); }
 
-// ─── CART ──────────────────────────────────────────────────
+// ── CART ──────────────────────────────────────────────────
 function goToCart() {
-  const c = COUNTRIES[selectedCountry];
-  const sub = getSubtotal(), tax = +(sub * c.taxRate).toFixed(2), total = getTotal();
-  document.getElementById('bill-subtotal').textContent = fmt(sub);
+  const c = COUNTRIES[country];
+  const sub = getSub(), tax = sub * c.taxRate, total = sub + tax;
+  document.getElementById('bill-sub').textContent = fmt(sub);
   document.getElementById('tax-label').textContent = c.taxLabel;
   document.getElementById('bill-tax').textContent = fmt(tax);
   document.getElementById('bill-total').textContent = fmt(total);
-  document.getElementById('savings-amount').textContent = fmt(+(total * 1.3).toFixed(2));
-  document.getElementById('checkout-total').textContent = fmt(total);
-  document.getElementById('cart-items-list').innerHTML = c.menu.filter(item=>cart[item.id]).map(item => `
+  document.getElementById('savings-amt').textContent = fmt(total * 1.3);
+  document.getElementById('co-total').textContent = fmt(total);
+  document.getElementById('cart-items-list').innerHTML = selectedRest.menu.filter(item=>cart[item.id]).map(item => `
     <div class="cart-item">
-      <div class="cart-item-emoji">${item.emoji}</div>
+      <img class="cart-item-img" src="${item.img}" alt="${item.name}" onerror="this.style.display='none'">
       <div class="cart-item-name">${item.name}</div>
-      <div class="qty-control">
+      <div class="qty-ctrl">
         <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
         <span class="qty-num">${cart[item.id]}</span>
         <button class="qty-btn" onclick="changeQty(${item.id},1)">+</button>
@@ -1011,7 +953,7 @@ function goToCart() {
 }
 
 function changeQty(id, delta) {
-  cart[id] = Math.max(0, (cart[id]||0) + delta);
+  cart[id] = Math.max(0,(cart[id]||0)+delta);
   if (!cart[id]) delete cart[id];
   updateCartBar();
   if (!Object.keys(cart).length) { showScreen('home'); return; }
@@ -1020,73 +962,70 @@ function changeQty(id, delta) {
 
 function goToCheckout() { showScreen('checkout'); }
 function selectPay(el) {
-  document.querySelectorAll('.pay-opt').forEach(o => o.classList.remove('selected'));
+  document.querySelectorAll('.pay-opt').forEach(o=>o.classList.remove('selected'));
   el.classList.add('selected');
 }
 
-// ─── TRACKING ──────────────────────────────────────────────
+// ── TRACKING ──────────────────────────────────────────────
 function placeOrder() {
-  const c = COUNTRIES[selectedCountry];
-  const rider = c.riders[Math.floor(Math.random() * c.riders.length)];
-  document.getElementById('rider-name').textContent = rider.name;
-  document.getElementById('rider-vehicle').textContent = '⭐ ' + rider.rating + ' · ' + rider.vehicle;
-  document.getElementById('rider-avatar').textContent = rider.avatar;
-
-  // Reset status dots
-  ['s2','s3','s4'].forEach(id => {
-    document.getElementById(id).className = 'status-dot pending';
-  });
-  document.getElementById('s2').className = 'status-dot active';
-  document.getElementById('s2').textContent = '👨‍🍳';
-  document.getElementById('s3').textContent = '🛵';
-  document.getElementById('s4').textContent = '🏠';
-  ['l2','l3'].forEach(id => document.getElementById(id).className = 'status-line');
-
+  const c = COUNTRIES[country];
+  const rider = c.riders[Math.floor(Math.random()*c.riders.length)];
+  document.getElementById('rider-nm').textContent = rider.name;
+  document.getElementById('rider-vh').textContent = '⭐ ' + rider.rating + ' · ' + rider.vehicle;
+  document.getElementById('rider-av').textContent = rider.av;
+  ['s2','s3','s4'].forEach(id => { document.getElementById(id).className='status-dot pending'; });
+  document.getElementById('s2').className='status-dot active';
+  document.getElementById('s2').textContent='👨‍🍳';
+  document.getElementById('s3').textContent='🛵';
+  document.getElementById('s4').textContent='🏠';
+  ['l2','l3'].forEach(id=>document.getElementById(id).className='status-line');
   showScreen('tracking');
   startTracking();
 }
 
 function startTracking() {
-  if (map) { map.remove(); map = null; }
+  if (map) { map.remove(); map=null; }
   if (trackingInterval) clearInterval(trackingInterval);
 
-  const dest = [userLocation.lat, userLocation.lng];
-  const rest = [restaurantLocation.lat, restaurantLocation.lng];
-  const path = (routeCoords && routeCoords.length > 1) ? routeCoords : [rest, dest];
+  const dest = [userLoc.lat, userLoc.lng];
+  const rest = [restLoc.lat, restLoc.lng];
+  const path = (routeCoords && routeCoords.length>1) ? routeCoords : [rest, dest];
 
-  document.getElementById('dist-display').textContent = distanceKm.toFixed(1) + ' km';
-  document.getElementById('traffic-display').textContent = getTrafficLabel();
-  document.getElementById('speed-display').textContent = COUNTRIES[selectedCountry].avgSpeedKmh + ' km/h';
-  document.getElementById('eta-time').textContent = etaMinutes;
+  document.getElementById('dist-val').textContent = distKm.toFixed(1) + ' km';
+  document.getElementById('traffic-val').textContent = getTrafficLabel();
+  document.getElementById('speed-val').textContent = COUNTRIES[country].avgSpeed + ' km/h';
+  document.getElementById('eta-countdown').textContent = etaMins;
 
   setTimeout(() => {
-    map = L.map('map', { zoomControl:false, attributionControl:false });
+    map = L.map('map', {zoomControl:false, attributionControl:false});
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-    const riderIcon = L.divIcon({ html:'<div style="font-size:22px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3))">🛵</div>', iconSize:[30,30], iconAnchor:[15,15], className:'' });
-    const destIcon  = L.divIcon({ html:'<div style="font-size:26px;line-height:1;">📍</div>', iconSize:[30,30], iconAnchor:[15,30], className:'' });
-    const restIcon  = L.divIcon({ html:'<div style="font-size:22px;line-height:1;">🍳</div>', iconSize:[30,30], iconAnchor:[15,15], className:'' });
+    const riderIcon = L.divIcon({html:'<div style="font-size:22px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))">🛵</div>',iconSize:[30,30],iconAnchor:[15,15],className:''});
+    const destIcon  = L.divIcon({html:'<div style="font-size:26px">📍</div>',iconSize:[30,30],iconAnchor:[15,30],className:''});
+    const restIcon  = L.divIcon({html:`<div style="font-size:22px">${selectedRest?.emoji||'🍳'}</div>`,iconSize:[30,30],iconAnchor:[15,15],className:''});
 
-    L.marker(rest, {icon:restIcon}).addTo(map);
-    L.marker(dest, {icon:destIcon}).addTo(map);
-    L.polyline(path, {color:'#D1D5DB', weight:4, dashArray:'8,6', opacity:0.7}).addTo(map);
-    const progressLine = L.polyline([], {color:'#FF4500', weight:4, opacity:0.95}).addTo(map);
-    riderMarker = L.marker(path[0], {icon:riderIcon}).addTo(map);
+    L.marker(rest,{icon:restIcon}).addTo(map);
+    L.marker(dest,{icon:destIcon}).addTo(map);
 
+    // Full route grey dashed
+    const fullLine = L.polyline(path, {color:'#444',weight:4,dashArray:'8,6',opacity:0.6}).addTo(map);
+    // Orange progress line — starts full, shrinks from restaurant end
+    const progressLine = L.polyline(path, {color:'#FF4500',weight:4,opacity:0.95}).addTo(map);
+
+    riderMarker = L.marker(path[0],{icon:riderIcon}).addTo(map);
     map.fitBounds(L.latLngBounds(path).pad(0.2));
 
-    // ── TIMING: 3x speedup — 30 mins feels like 10 mins ──
-    const SPEEDUP   = 5; // 5x — 15 mins feels like 3 mins, 30 mins like 6 mins
-    const totalMs   = (etaMinutes * 60 * 1000) / SPEEDUP;
-    const prepMs    = totalMs * 0.35;
-    const STEPS     = 300;
-    const stepMs    = totalMs / STEPS;
+    const SPEEDUP = 5;
+    const totalMs = (etaMins * 60 * 1000) / SPEEDUP;
+    const prepMs  = totalMs * 0.35;
+    const STEPS   = 300;
+    const stepMs  = totalMs / STEPS;
 
     // Prep → On the way
     setTimeout(() => {
       document.getElementById('s2').classList.remove('active');
       document.getElementById('s2').classList.add('done');
-      document.getElementById('s2').textContent = '✓';
+      document.getElementById('s2').textContent='✓';
       document.getElementById('l2').classList.add('done');
       document.getElementById('s3').classList.remove('pending');
       document.getElementById('s3').classList.add('active');
@@ -1096,11 +1035,11 @@ function startTracking() {
     setTimeout(() => {
       document.getElementById('s3').classList.remove('active');
       document.getElementById('s3').classList.add('done');
-      document.getElementById('s3').textContent = '✓';
+      document.getElementById('s3').textContent='✓';
       document.getElementById('l3').classList.add('done');
       document.getElementById('s4').classList.remove('pending');
       document.getElementById('s4').classList.add('done');
-      document.getElementById('s4').textContent = '✓';
+      document.getElementById('s4').textContent='✓';
       clearInterval(trackingInterval);
       setTimeout(showSuccess, 1500);
     }, totalMs);
@@ -1108,78 +1047,55 @@ function startTracking() {
     let step = 0;
     trackingInterval = setInterval(() => {
       step++;
-      const t = Math.min(step / STEPS, 1);
-      const etaLeft = Math.max(0, Math.round(etaMinutes * (1 - t)));
-      document.getElementById('eta-time').textContent = etaLeft;
+      const t = Math.min(step/STEPS, 1);
+      document.getElementById('eta-countdown').textContent = Math.max(0, Math.round(etaMins*(1-t)));
 
       if (step > STEPS * 0.35) {
         const dt = (t - 0.35) / 0.65;
-        const raw = dt * (path.length - 1);
-        const idx = Math.min(Math.floor(raw), path.length - 2);
+        const raw = dt * (path.length-1);
+        const idx = Math.min(Math.floor(raw), path.length-2);
         const seg = raw - idx;
-        const p1 = path[idx], p2 = path[idx + 1];
-        const rLat = p1[0] + (p2[0] - p1[0]) * seg;
-        const rLng = p1[1] + (p2[1] - p1[1]) * seg;
-        riderMarker.setLatLng([rLat, rLng]);
-        progressLine.setLatLngs([...path.slice(0, idx + 1), [rLat, rLng]]);
-        map.panTo([rLat, rLng], {animate:true, duration:0.8});
+        const p1=path[idx], p2=path[idx+1];
+        const rLat = p1[0]+(p2[0]-p1[0])*seg;
+        const rLng = p1[1]+(p2[1]-p1[1])*seg;
+        riderMarker.setLatLng([rLat,rLng]);
+
+        // Orange path: from rider position to destination (shrinks from restaurant end)
+        const riderIdx = idx;
+        const remainingPath = [[rLat,rLng], ...path.slice(riderIdx+1)];
+        progressLine.setLatLngs(remainingPath);
+
+        map.panTo([rLat,rLng],{animate:true,duration:0.8});
       }
-      if (step >= STEPS) clearInterval(trackingInterval);
+      if (step>=STEPS) clearInterval(trackingInterval);
     }, stepMs);
   }, 300);
 }
 
-// ─── SUCCESS ───────────────────────────────────────────────
+// ── SUCCESS ───────────────────────────────────────────────
 function showSuccess() {
-  const c = COUNTRIES[selectedCountry];
   streak++;
   localStorage.setItem('na_streak', streak);
-  document.getElementById('final-savings').textContent = 'You saved ' + fmt(+(getTotal() * 1.3).toFixed(2)) + ' today!';
-  document.getElementById('streak-count').textContent = streak;
+  document.getElementById('final-savings').textContent = 'You saved ' + fmt(getTotal()*1.3) + ' today';
+  document.getElementById('streak-n').textContent = streak;
   showScreen('success');
 }
 
-function shareWhatsApp() {
-  const c = COUNTRIES[selectedCountry];
-  const loc = userLocation ? userLocation.name : 'my area';
-  const t = `😂 I just ordered food to ${loc} and it never arrived (on purpose!)\n\nNeverArrive — fake food delivery for ${c.name}. ${c.currency}0 spent. Cravings handled.\n\nTry it → https://neverarrive.in`;
-  window.open('https://wa.me/?text=' + encodeURIComponent(t));
+function shareWA() {
+  const t = `😂 I just ordered food and it never arrived (on purpose!)\n\nNeverArrive — order anything, watch the rider, food never comes. Try it → https://neverarrive.in`;
+  window.open('https://wa.me/?text='+encodeURIComponent(t));
 }
-function shareTwitter() {
-  const c = COUNTRIES[selectedCountry];
-  const t = `Ordered ${c.menu[0].name} to ${userLocation?.name} at midnight and it never came (on purpose) 😂\n\nNeverArrive — India's dopamine food app, now in ${c.name}. ${c.currency}0 spent.\n\nhttps://neverarrive.in #NeverArrive`;
-  window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(t));
+function shareX() {
+  const t = `Ordered ${selectedRest?.name} at midnight and it never came (on purpose) 😂\n\nNeverArrive — the food delivery app where nothing arrives.\n\nhttps://neverarrive.in`;
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(t));
 }
 
-// ─── UTILS ─────────────────────────────────────────────────
-function haversine(lat1,lng1,lat2,lng2) {
-  const R=6371, dL=(lat2-lat1)*Math.PI/180, dl=(lng2-lng1)*Math.PI/180;
-  const a=Math.sin(dL/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dl/2)**2;
-  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-}
-function getTrafficMultiplier() {
-  const h = new Date().getHours();
-  if ((h>=8&&h<=10)||(h>=17&&h<=20)) return 1.6;
-  if (h>=12&&h<=14) return 1.3;
-  if (h>=22||h<=6) return 0.85;
-  return 1.2;
-}
-function getTrafficLabel() {
-  const h = new Date().getHours();
-  if ((h>=8&&h<=10)||(h>=17&&h<=20)) return 'Heavy';
-  if (h>=12&&h<=14) return 'Moderate';
-  if (h>=22||h<=6) return 'Light';
-  return 'Moderate';
-}
-function resetApp() {
-  cart = {};
-  showScreen('country');
-}
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
-  window.scrollTo(0,0);
-}
+// ── UTILS ─────────────────────────────────────────────────
+function haversine(lat1,lng1,lat2,lng2){const R=6371,dL=(lat2-lat1)*Math.PI/180,dl=(lng2-lng1)*Math.PI/180,a=Math.sin(dL/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+function getTrafficMult(){const h=new Date().getHours();if((h>=8&&h<=10)||(h>=17&&h<=20))return 1.6;if(h>=12&&h<=14)return 1.3;if(h>=22||h<=6)return 0.85;return 1.2;}
+function getTrafficLabel(){const h=new Date().getHours();if((h>=8&&h<=10)||(h>=17&&h<=20))return 'Heavy';if(h>=12&&h<=14)return 'Moderate';if(h>=22||h<=6)return 'Light';return 'Moderate';}
+function resetApp(){cart={};selectedRest=null;showScreen('country');}
+function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+name).classList.add('active');window.scrollTo(0,0);}
 </script>
 </body>
 </html>
