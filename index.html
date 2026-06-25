@@ -173,9 +173,9 @@ h1,h2,h3 { font-family: 'Syne', sans-serif; }
 /* ── RESTAURANT PICKER ── */
 .section-pad { padding: 20px 20px 0; }
 .section-label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
-.restaurant-scroll { display: flex; gap: 12px; padding: 0 20px 20px; overflow-x: auto; scrollbar-width: none; }
+.restaurant-scroll { display: flex; gap: 12px; padding: 0 20px 20px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; touch-action: pan-x; white-space: nowrap; }
 .restaurant-scroll::-webkit-scrollbar { display: none; }
-.rest-card { flex-shrink: 0; width: 160px; background: var(--card); border-radius: var(--radius); overflow: hidden; cursor: pointer; border: 1.5px solid transparent; transition: all 0.15s; }
+.rest-card { flex-shrink: 0; flex-grow: 0; min-width: 160px; width: 160px; background: var(--card); border-radius: var(--radius); overflow: hidden; cursor: pointer; border: 1.5px solid transparent; transition: all 0.15s; display: inline-block; }
 .rest-card.selected { border-color: var(--orange); }
 .rest-img { width: 100%; height: 100px; object-fit: cover; }
 .rest-img-placeholder { width: 100%; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 36px; }
@@ -248,7 +248,7 @@ h1,h2,h3 { font-family: 'Syne', sans-serif; }
 .pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .pay-opt { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 14px; cursor: pointer; text-align: center; transition: all 0.15s; }
 .pay-opt.selected { border-color: var(--orange); background: var(--orange-dim); }
-.pay-opt-icon { font-size: 22px; margin-bottom: 6px; }
+.pay-opt-icon { font-size: 22px; margin-bottom: 6px; height: 30px; display: flex; align-items: center; justify-content: center; }
 .pay-opt-label { font-size: 12px; font-weight: 500; color: var(--white); }
 .confirm-btn { background: var(--orange); color: white; border: none; border-radius: var(--radius); padding: 17px; font-size: 16px; font-weight: 600; width: 100%; cursor: pointer; font-family: 'Inter', sans-serif; margin-top: 8px; }
 .order-sum { background: var(--card); border-radius: var(--radius-sm); padding: 14px; }
@@ -513,7 +513,12 @@ const COUNTRIES = {
       {name:'Suresh Yadav',vehicle:'Bajaj Pulsar',rating:'4.7',av:'👨'},
       {name:'Mohan Singh',vehicle:'TVS Apache',rating:'4.9',av:'🧔'},
     ],
-    pay:[{icon:'📱',label:'UPI'},{icon:'💳',label:'Card'},{icon:'💵',label:'Cash'},{icon:'🏦',label:'Net Banking'}],
+    pay:[
+      {icon:'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/1200px-UPI-Logo-vector.svg.png" style="height:24px;object-fit:contain">',label:'UPI'},
+      {icon:'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/1200px-Visa_Inc._logo.svg.png" style="height:18px;object-fit:contain">',label:'Card'},
+      {icon:'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/1200px-Paytm_Logo_%28standalone%29.svg.png" style="height:20px;object-fit:contain">',label:'Paytm'},
+      {icon:'💵',label:'Cash'},
+    ],
     restaurants:[
       {id:'dhaba',name:'Punjabi Dhaba',cuisine:'North Indian',rating:'4.8',dist:'1.2 km',emoji:'🍛',color:'#FF6B35',
         cats:[{id:'curry',label:'🍲 Curries'},{id:'breads',label:'🫓 Breads'},{id:'drinks',label:'🥤 Drinks'}],
@@ -557,7 +562,12 @@ const COUNTRIES = {
       {name:'Liam O\'Brien',vehicle:'Yamaha scooter',rating:'4.7',av:'🧑'},
       {name:'Noah Williams',vehicle:'E-bike',rating:'4.8',av:'👨'},
     ],
-    pay:[{icon:'💳',label:'Card'},{icon:'📱',label:'Apple Pay'},{icon:'🟡',label:'PayID'},{icon:'🏦',label:'BPAY'}],
+    pay:[
+      {icon:'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1200px-Apple_logo_black.svg.png" style="height:22px;object-fit:contain;filter:invert(1)">',label:'Apple Pay'},
+      {icon:'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/1200px-Visa_Inc._logo.svg.png" style="height:18px;object-fit:contain">',label:'Card'},
+      {icon:'<span style="font-size:13px;font-weight:700;color:#FF6B00">PayID</span>',label:'PayID'},
+      {icon:'<span style="font-size:13px;font-weight:700;color:#0072CE">BPAY</span>',label:'BPAY'},
+    ],
     restaurants:[
       {id:'cafe',name:'The Corner Cafe',cuisine:'Brunch & Coffee',rating:'4.9',dist:'0.8 km',emoji:'☕',color:'#6B4226',
         cats:[{id:'brunch',label:'🥞 Brunch'},{id:'lunch',label:'🥗 Lunch'},{id:'coffee',label:'☕ Coffee'}],
@@ -587,7 +597,12 @@ const COUNTRIES = {
       {name:'Tyler Johnson',vehicle:'Toyota Corolla',rating:'4.8',av:'🧑'},
       {name:'Marcus Davis',vehicle:'Honda Civic',rating:'4.9',av:'👨'},
     ],
-    pay:[{icon:'💳',label:'Credit Card'},{icon:'🍎',label:'Apple Pay'},{icon:'🅿️',label:'PayPal'},{icon:'📱',label:'Venmo'}],
+    pay:[
+      {icon:'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1200px-Apple_logo_black.svg.png" style="height:22px;object-fit:contain;filter:invert(1)">',label:'Apple Pay'},
+      {icon:'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/1200px-PayPal.svg.png" style="height:22px;object-fit:contain">',label:'PayPal'},
+      {icon:'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/1200px-Visa_Inc._logo.svg.png" style="height:18px;object-fit:contain">',label:'Card'},
+      {icon:'<span style="font-size:13px;font-weight:700;color:#008CFF">Venmo</span>',label:'Venmo'},
+    ],
     restaurants:[
       {id:'burgers',name:'The Burger Joint',cuisine:'American Classics',rating:'4.9',dist:'1.1 km',emoji:'🍔',color:'#E74C3C',
         cats:[{id:'burgers',label:'🍔 Burgers'},{id:'sides',label:'🍟 Sides'},{id:'drinks',label:'🥤 Drinks'}],
@@ -615,7 +630,12 @@ const COUNTRIES = {
       {name:'James Fletcher',vehicle:'Yamaha scooter',rating:'4.8',av:'🧑'},
       {name:'Oliver Smith',vehicle:'Pedal cycle',rating:'4.7',av:'🚴'},
     ],
-    pay:[{icon:'💳',label:'Card'},{icon:'📱',label:'Apple Pay'},{icon:'🏦',label:'Bank Transfer'},{icon:'💵',label:'Cash'}],
+    pay:[
+      {icon:'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1200px-Apple_logo_black.svg.png" style="height:22px;object-fit:contain;filter:invert(1)">',label:'Apple Pay'},
+      {icon:'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/1200px-Visa_Inc._logo.svg.png" style="height:18px;object-fit:contain">',label:'Card'},
+      {icon:'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Google_Pay_Logo.svg/1200px-Google_Pay_Logo.svg.png" style="height:22px;object-fit:contain">',label:'Google Pay'},
+      {icon:'💵',label:'Cash'},
+    ],
     restaurants:[
       {id:'chippy',name:'The Golden Chippy',cuisine:'British Classics',rating:'4.9',dist:'0.9 km',emoji:'🐟',color:'#2980B9',
         cats:[{id:'mains',label:'🐟 Mains'},{id:'sides',label:'🍟 Sides'},{id:'puds',label:'🍮 Puds'}],
@@ -643,7 +663,12 @@ const COUNTRIES = {
       {name:'Wei Liang',vehicle:'Yamaha scooter',rating:'4.9',av:'🧑'},
       {name:'Raj Kumar',vehicle:'Grab e-bike',rating:'4.8',av:'👨'},
     ],
-    pay:[{icon:'📱',label:'PayNow'},{icon:'🪙',label:'GrabPay'},{icon:'💳',label:'Card'},{icon:'💵',label:'Cash'}],
+    pay:[
+      {icon:'<span style="font-size:13px;font-weight:700;color:#9B1B30">PayNow</span>',label:'PayNow'},
+      {icon:'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Google_Pay_Logo.svg/1200px-Google_Pay_Logo.svg.png" style="height:22px;object-fit:contain">',label:'GrabPay'},
+      {icon:'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/1200px-Visa_Inc._logo.svg.png" style="height:18px;object-fit:contain">',label:'Card'},
+      {icon:'💵',label:'Cash'},
+    ],
     restaurants:[
       {id:'hawker',name:'Maxwell Hawker',cuisine:'Hawker & Local',rating:'4.9',dist:'0.7 km',emoji:'🍜',color:'#E74C3C',
         cats:[{id:'rice',label:'🍚 Rice & Noodles'},{id:'hawker',label:'🍢 Hawker Faves'},{id:'drinks',label:'🥤 Drinks'}],
@@ -663,7 +688,12 @@ const COUNTRIES = {
       {name:'Mohammed Al Rashid',vehicle:'Toyota Yaris',rating:'4.9',av:'🧑'},
       {name:'Ahmed Hassan',vehicle:'Nissan Sunny',rating:'4.8',av:'👨'},
     ],
-    pay:[{icon:'💳',label:'Card'},{icon:'📱',label:'Apple Pay'},{icon:'💵',label:'Cash'},{icon:'🏦',label:'Bank Transfer'}],
+    pay:[
+      {icon:'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1200px-Apple_logo_black.svg.png" style="height:22px;object-fit:contain;filter:invert(1)">',label:'Apple Pay'},
+      {icon:'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/1200px-Visa_Inc._logo.svg.png" style="height:18px;object-fit:contain">',label:'Card'},
+      {icon:'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Google_Pay_Logo.svg/1200px-Google_Pay_Logo.svg.png" style="height:22px;object-fit:contain">',label:'Google Pay'},
+      {icon:'💵',label:'Cash'},
+    ],
     restaurants:[
       {id:'arabic',name:'Al Baik Express',cuisine:'Arabic & Levantine',rating:'4.9',dist:'1.2 km',emoji:'🥙',color:'#27AE60',
         cats:[{id:'mains',label:'🥙 Mains'},{id:'grills',label:'🍖 Grills'},{id:'sweets',label:'🍯 Sweets'}],
@@ -683,7 +713,12 @@ const COUNTRIES = {
       {name:'Kenji Tanaka',vehicle:'Honda Cub',rating:'4.9',av:'🧑'},
       {name:'Hiroshi Yamamoto',vehicle:'Yamaha Gear',rating:'4.8',av:'👨'},
     ],
-    pay:[{icon:'📱',label:'PayPay'},{icon:'💳',label:'Card'},{icon:'💴',label:'Cash'},{icon:'🔵',label:'Suica'}],
+    pay:[
+      {icon:'<span style="font-size:13px;font-weight:700;color:#FF0033">PayPay</span>',label:'PayPay'},
+      {icon:'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/1200px-Visa_Inc._logo.svg.png" style="height:18px;object-fit:contain">',label:'Card'},
+      {icon:'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1200px-Apple_logo_black.svg.png" style="height:22px;object-fit:contain;filter:invert(1)">',label:'Apple Pay'},
+      {icon:'💴',label:'Cash'},
+    ],
     restaurants:[
       {id:'ramen',name:'麺屋 一風堂',cuisine:'Ramen & Noodles',rating:'4.9',dist:'0.9 km',emoji:'🍜',color:'#C0392B',
         cats:[{id:'ramen',label:'🍜 ラーメン'},{id:'sides',label:'🥟 サイド'},{id:'drinks',label:'🍺 ドリンク'}],
