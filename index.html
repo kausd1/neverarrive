@@ -366,10 +366,17 @@ h1,h2,h3 { font-family: 'Syne', sans-serif; }
     </div>
   </div>
 
-  <div class="section-pad">
-    <div class="section-label">Pick a restaurant</div>
+  <div style="padding: 20px 20px 0; display:flex; align-items:center; justify-content:space-between;">
+    <div class="section-label" style="margin-bottom:0">Pick a restaurant</div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="scrollRest(-1)" style="width:28px;height:28px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">‹</button>
+      <button onclick="scrollRest(1)" style="width:28px;height:28px;border-radius:50%;background:var(--orange);border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">›</button>
+    </div>
   </div>
-  <div class="restaurant-scroll" id="restaurant-scroll"></div>
+  <div style="position:relative;">
+    <div class="restaurant-scroll" id="restaurant-scroll"></div>
+    <div style="position:absolute;right:0;top:0;bottom:0;width:40px;background:linear-gradient(to right,transparent,var(--black));pointer-events:none;border-radius:0 var(--radius) var(--radius) 0;"></div>
+  </div>
 
   <div class="eta-strip" id="eta-strip">
     <div class="eta-strip-left">🟢 Delivering to <span id="eta-loc">your area</span></div>
@@ -1129,6 +1136,10 @@ function shareX() {
 function haversine(lat1,lng1,lat2,lng2){const R=6371,dL=(lat2-lat1)*Math.PI/180,dl=(lng2-lng1)*Math.PI/180,a=Math.sin(dL/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
 function getTrafficMult(){const h=new Date().getHours();if((h>=8&&h<=10)||(h>=17&&h<=20))return 1.6;if(h>=12&&h<=14)return 1.3;if(h>=22||h<=6)return 0.85;return 1.2;}
 function getTrafficLabel(){const h=new Date().getHours();if((h>=8&&h<=10)||(h>=17&&h<=20))return 'Heavy';if(h>=12&&h<=14)return 'Moderate';if(h>=22||h<=6)return 'Light';return 'Moderate';}
+function scrollRest(dir) {
+  const el = document.getElementById('restaurant-scroll');
+  el.scrollBy({left: dir * 180, behavior: 'smooth'});
+}
 function resetApp(){cart={};selectedRest=null;showScreen('country');}
 function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+name).classList.add('active');window.scrollTo(0,0);}
 </script>
